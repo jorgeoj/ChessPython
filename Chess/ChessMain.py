@@ -32,11 +32,33 @@ def main():
     gs = ChessEngine.GameState() # Crea un objeto GameState para representar el estado del juego
     loadImages() # Carga las imágenes de las piezas
     running = True
+    sqSelected = () # Vble para saber el cuadrado seleccionado, inicialmente no hay ninguna (tuple)
+    playerClicks = [] # Constancia de los clicks del jugador para mover las piezas (2 tuples)
     while running:
         for e in p.event.get():
             # Si el usuario cierra la ventana, detiene el bucle principal
             if e.type == p.QUIT :
                 running = False
+            elif e.type == p.MOUSEBUTTONDOWN:
+                location = p.mouse.get_pos() # Localizacion en ejes x e y del raton
+                col = location[0]//SQ_SIZE
+                row = location[1]//SQ_SIZE
+                # Si el jugador pulsa 2 veces la misma casilla, se deselecciona la casilla
+                if sqSelected == (col, row):
+                    sqSelected = ()
+                    playerClicks = []
+                else:
+                    sqSelected = (row, col)
+                    playerClicks.append(sqSelected)
+                # Si el jugador ha hecho click dos veces hacemos que se mueva la pieza
+                if len(playerClicks) == 2:
+                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                    print(move.getChessNotation())
+                    gs.makeMove(move)
+                    # Reseteamos los clicks del jugador y lo seleccionado
+                    sqSelected = ()
+                    playerClicks = []
+
         drawGameState(screen, gs) # Dibuja el estado actual del juego en la pantalla
         clock.tick(MAX_FPS) # Controla la velocidad de actualización de la pantalla
         p.display.flip() # Actualiza la pantalla

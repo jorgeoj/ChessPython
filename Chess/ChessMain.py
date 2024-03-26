@@ -30,15 +30,20 @@ def main():
     clock = p.time.Clock() # Objeto para controlar el tiempo del juego
     screen.fill(p.Color("white"))
     gs = ChessEngine.GameState() # Crea un objeto GameState para representar el estado del juego
+    validMoves = gs.getValidMoves() # Generamos los movimientos validos y los guardamos en una lista
+    moveMade = False # Variable flag para cuando un movimiento es hecho
+
     loadImages() # Carga las imágenes de las piezas
     running = True
     sqSelected = () # Vble para saber el cuadrado seleccionado, inicialmente no hay ninguna (tuple)
     playerClicks = [] # Constancia de los clicks del jugador para mover las piezas (2 tuples)
+
     while running:
         for e in p.event.get():
             # Si el usuario cierra la ventana, detiene el bucle principal
-            if e.type == p.QUIT :
+            if e.type == p.QUIT:
                 running = False
+            # Al pulsar el raton
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos() # Localizacion en ejes x e y del raton
                 col = location[0]//SQ_SIZE
@@ -54,10 +59,21 @@ def main():
                 if len(playerClicks) == 2:
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                     print(move.getChessNotation())
-                    gs.makeMove(move)
+                    if move in validMoves:
+                        gs.makeMove(move)
+                        moveMade = True
                     # Reseteamos los clicks del jugador y lo seleccionado
                     sqSelected = ()
                     playerClicks = []
+            # Al pulsar una tecla
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z: # Deshacer movimiento con tecla "z" (se puede cambiar)
+                    gs.undoMove()
+                    moveMade = True
+
+        if moveMade:
+            validMoves = gs.getValidMoves()
+            moveMade = False
 
         drawGameState(screen, gs) # Dibuja el estado actual del juego en la pantalla
         clock.tick(MAX_FPS) # Controla la velocidad de actualización de la pantalla

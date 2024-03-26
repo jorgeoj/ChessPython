@@ -23,6 +23,9 @@ class GameState():
         # Lista para mantener un registro de los movimientos realizados durante la partida
         self.moveLog = []
 
+    """
+    Coge un movimiento como parametro y lo ejecuta (No funciona para enrocar, en-passant y promoción)
+    """
     def makeMove(self, move):
         # Actualiza el tablero con el movimiento realizado
         self.board[move.startRow][move.startCol] = "--" # La casilla de origen se convierte en vacía
@@ -30,6 +33,50 @@ class GameState():
         self.moveLog.append(move) # Registra el movimiento por si queremos deshacerlo luego
         self.whiteToMove = not self.whiteToMove # Cambiar el turno de jugador
 
+    """
+    Deshacer el ultimo movimiento hecho
+    """
+    def undoMove(self):
+        if len(self.moveLog) != 0: # Asegurarse que hay un movimiento para deshacer
+            move = self.moveLog.pop()
+            self.board[move.startRow][move.startCol] = move.pieceMoved
+            self.board[move.endRow][move.endCol] = move.pieceCaptured
+            self.whiteToMove = not  self.whiteToMove # Cambiar turno
+
+    """
+    Todos los movimientos considerando jaque
+    """
+    def getValidMoves(self):
+        return self.getAllPossibleMoves() # Mas adelante se cambiará (ahora no nos preocupamos de los jaques)
+
+    """
+    Todos los movimientos sin considerar jaques
+    """
+    def getAllPossibleMoves(self):
+        moves = [Move((6,4),(4,4), self.board)] # Por ahora no hay movs validos esto se cambiara
+        for r in range(len(self.board)): # Numero de filas
+            for c in range(len(self.board[r])): # Numero de columnas en la fila dada
+                turn = self.board[r][c][0]
+                if(turn == 'w' and self.whiteToMove) and (turn == 'b' and not self.whiteToMove):
+                    piece = self.board[r][c][1]
+                    # Segun la pieza que sea llamaremos a la funcion de los movimientos de la pieza (Aun hay que poner el resto)
+                    if piece == 'p':
+                        self.getPawnMoves(r, c, moves)
+                    elif piece == 'R':
+                        self.getRookMoves(r, c, moves)
+        return moves
+
+    """
+    Obtener todos los movimientos del peon en la fila y columna y añadir los movimientos a la lista "moves"
+    """
+    def getPawnMoves(self, r, c, moves):
+        pass
+
+    """
+    Obtener todos los movimientos de la torre en la fila y columna y añadir los movimientos a la lista "moves"
+    """
+    def getRookMoves(self, r, c, moves):
+        pass
 
 class Move():
     # Mapea claves a valores Clave : Valor
@@ -48,6 +95,18 @@ class Move():
         self.endCol = endSq[1]
         self.pieceMoved = board[self.startRow][self.startCol] # Pieza movida
         self.pieceCaptured = board[self.endRow][self.endCol] # Pieza capturada
+        self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
+        print(self.moveID)
+
+    """
+    Override metodo equals
+    """
+    def __eq__(self, other):
+        if isinstance(other, Move):
+            return  self.moveID == other.moveID
+        return False
+
+
 
     def getChessNotation(self):
         # Devuelve la notación de ajedrez del movimiento (por ejemplo, "e2e4" para un movimiento de peón)

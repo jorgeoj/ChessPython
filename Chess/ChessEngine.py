@@ -98,9 +98,9 @@ class GameState():
             if c-1 >= 0: # capturar a la izquierda
                 if self.board[r+1][c-1][0] == 'w':
                     moves.append(Move((r, c), (r+1, c-1), self.board))
-                if c+1 <= 7: # capturar a la derecha
-                    if self.board[r+1][c+1][0] == 'w':
-                        moves.append(Move((r, c), (r+1, c+1), self.board))
+            if c+1 <= 7: # capturar a la derecha
+                if self.board[r+1][c+1][0] == 'w':
+                    moves.append(Move((r, c), (r+1, c+1), self.board))
         # Para mas adelante: Añadir promocion
 
 
@@ -131,21 +131,47 @@ class GameState():
     """
 
     def getKnightMoves(self, r, c, moves):
-        pass
+        knightMoves = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)) # Movimiento en L
+        allyColor = "w" if self.whiteToMove else "b"
+        for m in knightMoves:
+            endRow = r + m[0]
+            endCol = c + m[1]
+            if 0 <= endRow < 8 and 0 <= endCol < 8:
+                endPiece = self.board[endRow][endCol]
+                if endPiece[0] != allyColor: # No una pieza aliada (vacia o enemigo)
+                    moves.append(Move((r, c), (endRow, endCol), self.board))
 
     """
     Obtener todos los movimientos del alfil en la fila y columna y añadir los movimientos a la lista "moves"
     """
 
     def getBishopMoves(self, r, c, moves):
-        pass
+        directions = ((-1, -1), (-1, 1), (1, -1), (1, 1)) # Las 4 diagonales
+        enemyColor = "b" if self.whiteToMove else "w" # Si el turno es de blancas el enemigo son las negras y viceversa
+        for d in directions:
+            for i in range(1, 8): # El alfil se puede mover 7 casillas (REVISAR POR SI ACASO)
+                endRow = r + d[0] * i
+                endCol = c + d[1] * i
+                if 0 <= endRow < 8 and 0 <= endCol < 8: # Comprobamos que está dentro del tablero
+                    endPiece = self.board[endRow][endCol]
+                    if endPiece == "--": # Si la casilla final es un espacio vacio valido
+                        moves.append(Move((r, c), (endRow, endCol), self.board))
+                    elif endPiece[0] == enemyColor: # Si la casilla final es una pieza del color contrario
+                        moves.append(Move((r, c), (endRow, endCol), self.board))
+                        break
+                    else: # Movimiento no valido por pieza del mismo color
+                        break
+                else: # Fuera del tablero
+                    break
 
     """
     Obtener todos los movimientos de la reina en la fila y columna y añadir los movimientos a la lista "moves"
     """
 
     def getQueenMoves(self, r, c, moves):
-        pass
+        # Los movimientos de la reina son los de un alfil y una torre juntos
+        self.getRookMoves(r, c, moves)
+        self.getBishopMoves(r, c, moves)
 
     """
     Obtener todos los movimientos del rey en la fila y columna y añadir los movimientos a la lista "moves"
@@ -181,7 +207,7 @@ class Move():
         self.pieceMoved = board[self.startRow][self.startCol] # Pieza movida
         self.pieceCaptured = board[self.endRow][self.endCol] # Pieza capturada
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
-        print(self.moveID)
+        # print(self.moveID)
 
     """
     Override metodo equals

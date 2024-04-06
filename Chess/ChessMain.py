@@ -51,7 +51,7 @@ def main():
                 # Si el jugador pulsa 2 veces la misma casilla, se deselecciona la casilla
                 if sqSelected == (col, row):
                     sqSelected = ()
-                    playerClicks = []
+                    playerClicks = [] # Limpiar clicks de jugador
                 else:
                     sqSelected = (row, col)
                     playerClicks.append(sqSelected)
@@ -62,9 +62,13 @@ def main():
                     if move in validMoves:
                         gs.makeMove(move)
                         moveMade = True
-                    # Reseteamos los clicks del jugador y lo seleccionado
-                    sqSelected = ()
-                    playerClicks = []
+                        # Reseteamos los clicks del jugador y lo seleccionado
+                        sqSelected = ()
+                        playerClicks = []
+                    else:
+                        # Si nos equivocamos de pieza al hacer click y le damos a la que queremos mover en el segundo
+                        # se guarda el click para que haga el movimiento la segunda pieza clicada
+                        playerClicks = [sqSelected]
             # Al pulsar una tecla
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z: # Deshacer movimiento con tecla "z" (se puede cambiar)

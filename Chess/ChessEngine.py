@@ -26,6 +26,13 @@ class GameState():
         self.whiteToMove = True
         # Lista para mantener un registro de los movimientos realizados durante la partida
         self.moveLog = []
+        # Vamos a guardar la posicion de los reyes para no permitir hacer movimientos que los pongan en jaque
+        self.whiteKingLocation = (7, 4)
+        self.blackKingLocation = (0, 4)
+        # El rey no tiene movimientos validos y está en jaque
+        self.checkMate = False
+        # El rey no tiene movimientos validos pero no está en jaque
+        self.staleMate = False
 
     """
     Coge un movimiento como parametro y lo ejecuta (No funciona para enrocar, en-passant y promoción)
@@ -36,6 +43,11 @@ class GameState():
         self.board[move.endRow][move.endCol] = move.pieceMoved # La pieza se mueve a la casilla de destino
         self.moveLog.append(move) # Registra el movimiento por si queremos deshacerlo luego
         self.whiteToMove = not self.whiteToMove # Cambiar el turno de jugador
+        # Actualizamos la posicion del rey si se ha movido
+        if move.pieceMoved == 'wK':
+            self.whiteKingLocation = (move.endRow, move.endCol)
+        elif move.pieceMoved == 'bK':
+            self.blackKingLocation = (move.endRow, move.endCol)
 
     """
     Deshacer el ultimo movimiento hecho
@@ -46,12 +58,59 @@ class GameState():
             self.board[move.startRow][move.startCol] = move.pieceMoved
             self.board[move.endRow][move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove # Cambiar turno
+            # Actualizar la posicion del rey si fue la ultima pieza movida a la posicion anterior
+            if move.pieceMoved == 'wK':
+                self.whiteKingLocation = (move.startRow, move.startCol)
+            elif move.pieceMoved == 'bK':
+                self.blackKingLocation = (move.startRow, move.startCol)
 
     """
     Todos los movimientos considerando jaque
     """
     def getValidMoves(self):
-        return self.getAllPossibleMoves() # Mas adelante se cambiará (ahora no nos preocupamos de los jaques)
+        # Generamos todos los movimientos posibles, para cada movimiento hacemos el movimiento, luego generamos todos
+        # los movimientos del oponente y para cada uno de esos movimientos, miraremos si atacan al rey, si lo hacen
+        # no será un movimiento valido
+        moves = self.getAllPossibleMoves()
+        for i in range(len(moves)-1, -1, -1): # Recorrer la lista del reves para que al borrar no de problemas
+            self.makeMove(moves[i])
+            self.whiteToMove = not self.whiteToMove
+            if self.inCheck():
+                moves.remove(moves[i]) # Quitamos el movimiento no valido
+            self.whiteToMove = not self.whiteToMove
+            self.undoMove()
+        if len(moves) == 0: # Esto significa que es jaque o estancamiento (rey ahogado)
+            if self.inCheck():
+                self.checkMate = True
+            else:
+                self.staleMate = True
+        else:
+            self.checkMate = False
+            self.staleMate = False
+
+        return moves
+
+    """
+    Determina si el jugador está en jaque
+    """
+    def inCheck(self):
+        if self.whiteToMove:
+            return self.squareUnderAttack(self.whiteKingLocation[0], self.whiteKingLocation[1])
+        else:
+            return self.squareUnderAttack(self.blackKingLocation[0], self.blackKingLocation[1])
+
+    """
+    Determinar si el enemigo puede atacar a la casilla r, c (row, column)
+    """
+    def squareUnderAttack(self, r, c):
+        self.whiteToMove = not self.whiteToMove # Cambiamos al turno del oponente
+        oppMoves = self.getAllPossibleMoves()
+        self.whiteToMove = not self.whiteToMove  # Volvemos a cambiar el turno
+        for move in oppMoves:
+            # Si se cumple la casilla está siendo atacada
+            if move.endRow == r and move.endCol == c:
+                return True
+        return False
 
     """
     Todos los movimientos sin considerar jaques

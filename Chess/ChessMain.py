@@ -59,13 +59,14 @@ def main():
                 if len(playerClicks) == 2:
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                     print(move.getChessNotation())
-                    if move in validMoves:
-                        gs.makeMove(move)
-                        moveMade = True
-                        # Reseteamos los clicks del jugador y lo seleccionado
-                        sqSelected = ()
-                        playerClicks = []
-                    else:
+                    for i in range(len(validMoves)):
+                        if move == validMoves[i]:
+                            gs.makeMove(validMoves[i])
+                            moveMade = True
+                            # Reseteamos los clicks del jugador y lo seleccionado
+                            sqSelected = ()
+                            playerClicks = []
+                    if not moveMade:
                         # Si nos equivocamos de pieza al hacer click y le damos a la que queremos mover en el segundo
                         # se guarda el click para que haga el movimiento la segunda pieza clicada
                         playerClicks = [sqSelected]

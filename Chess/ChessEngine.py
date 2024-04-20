@@ -33,6 +33,7 @@ class GameState():
         self.checkMate = False
         # El rey no tiene movimientos validos pero no está en jaque
         self.staleMate = False
+        self.enpassantPossible = () # Coordeandas para la casilla donde en passant es posible
 
     """
     Coge un movimiento como parametro y lo ejecuta (No funciona para enrocar, en-passant y promoción)
@@ -49,6 +50,21 @@ class GameState():
         elif move.pieceMoved == 'bK':
             self.blackKingLocation = (move.endRow, move.endCol)
 
+        # Promocion de peones
+        if move.isPawnPromotion:
+            self.board[move.endRow][move.endCol] = move.pieceMoved[0] + 'Q' # Coge el color de la pieza y lo convierte en reina directamente
+
+        # Enpassant
+        if move.isEnpassantMove:
+            self.board[move.startRow][move.endCol] = '--' # Capturar el peon
+
+        # Actualizar variable enPassantPossible
+        if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2: # Solo avances de 2 casillas de peones
+            self.enpassantPossible = ((move.startRow + move.endRow)//2, move.startCol)
+        else:
+            self.enpassantPossible = ()
+
+
     """
     Deshacer el ultimo movimiento hecho
     """
@@ -63,11 +79,20 @@ class GameState():
                 self.whiteKingLocation = (move.startRow, move.startCol)
             elif move.pieceMoved == 'bK':
                 self.blackKingLocation = (move.startRow, move.startCol)
+            # Deshacer el en passant
+            if move.isEnpassantMove:
+                self.board[move.endRow][move.endCol] = '--' # Dejamos donde se quedo el peon vacio
+                self.board[move.startRow][move.endCol] = move.pieceCaptured
+                self.enpassantPossible = (move.endRow, move.endCol)
+            # Dehacer avance de 2 casillas del peon
+            if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2:
+                self.enpassantPossible = ()
 
     """
     Todos los movimientos considerando jaque
     """
     def getValidMoves(self):
+        tempEnpassantPossible = self.enpassantPossible
         # Generamos todos los movimientos posibles, para cada movimiento hacemos el movimiento, luego generamos todos
         # los movimientos del oponente y para cada uno de esos movimientos, miraremos si atacan al rey, si lo hacen
         # no será un movimiento valido
@@ -84,9 +109,8 @@ class GameState():
                 self.checkMate = True
             else:
                 self.staleMate = True
-        else:
-            self.checkMate = False
-            self.staleMate = False
+
+        self.enpassantPossible = tempEnpassantPossible
 
         return moves
 
@@ -141,10 +165,14 @@ class GameState():
             if c-1 >= 0:
                 if self.board[r-1][c-1][0] == 'b':
                     moves.append(Move((r, c), (r-1, c-1), self.board))
+                elif (r-1, c-1) == self.enpassantPossible:
+                    moves.append(Move((r, c), (r - 1, c - 1), self.board, isEnpassantMove=True))
             # Para capturar a la derecha
             if c+1 <= 7:
                 if self.board[r-1][c+1][0] == 'b': # indicamos que la pieza es de color contrario
                     moves.append(Move((r, c), (r-1, c+1), self.board))
+                elif (r-1, c+1) == self.enpassantPossible:
+                    moves.append(Move((r, c), (r - 1, c + 1), self.board, isEnpassantMove=True))
         # Movimiento de los peones negros
         else:
             # El peon avanza una casilla
@@ -157,10 +185,13 @@ class GameState():
             if c-1 >= 0: # capturar a la izquierda
                 if self.board[r+1][c-1][0] == 'w':
                     moves.append(Move((r, c), (r+1, c-1), self.board))
+                elif (r+1, c-1) == self.enpassantPossible:
+                    moves.append(Move((r, c), (r + 1, c - 1), self.board, isEnpassantMove=True))
             if c+1 <= 7: # capturar a la derecha
                 if self.board[r+1][c+1][0] == 'w':
                     moves.append(Move((r, c), (r+1, c+1), self.board))
-        # Para mas adelante: Añadir promocion
+                elif (r+1, c+1) == self.enpassantPossible:
+                    moves.append(Move((r, c), (r + 1, c + 1), self.board, isEnpassantMove=True))
 
 
     """
@@ -257,7 +288,7 @@ class Move():
                    "e": 4, "f": 5, "g": 6, "h": 7}
     colsToFiles = {v: k for k, v in filesToCols.items()}
 
-    def __init__(self, startSq, endSq, board):
+    def __init__(self, startSq, endSq, board, isEnpassantMove = False):
         # Inicializa los atributos del movimiento
         self.startRow = startSq[0]
         self.startCol = startSq[1]
@@ -265,6 +296,13 @@ class Move():
         self.endCol = endSq[1]
         self.pieceMoved = board[self.startRow][self.startCol] # Pieza movida
         self.pieceCaptured = board[self.endRow][self.endCol] # Pieza capturada
+        # Para la promocion del peon (en su metodo hay que repetir esto muchas veces)
+        self.isPawnPromotion = (self.pieceMoved == 'wp' and self.endRow == 0) or (self.pieceMoved == 'bp' and self.endCol == 7)
+        # Para el en passant
+        self.isEnpassantMove = isEnpassantMove
+        if self.isEnpassantMove:
+            self.pieceCaptured = 'wp' if self.pieceMoved == 'bp' else 'bp'
+
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
         # print(self.moveID)
 

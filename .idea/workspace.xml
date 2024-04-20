@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="10a920ac-7f3a-4e6f-aac3-00d77685f0d8" name="Changes" comment="Cambio parte mal tabulada mov peones (sigue bug casillas), añadidos movimientos: alfil, caballo y reina. &#10;Añadido segundo clic en pieza mismo color guarda clic para mover esa pieza despues">
+    <list default="true" id="10a920ac-7f3a-4e6f-aac3-00d77685f0d8" name="Changes" comment="Añadida la lógica de restringir movimientos por jaque">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Chess/ChessEngine.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/ChessEngine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Chess/ChessMain.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/ChessMain.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +85,11 @@
       <workItem from="1712248012876" duration="472000" />
       <workItem from="1712389740926" duration="3987000" />
       <workItem from="1712682821625" duration="1449000" />
-      <workItem from="1712759097300" duration="3088000" />
+      <workItem from="1712759097300" duration="3204000" />
+      <workItem from="1713076478074" duration="2631000" />
+      <workItem from="1713280277000" duration="8081000" />
+      <workItem from="1713458303974" duration="3817000" />
+      <workItem from="1713596737177" duration="1385000" />
     </task>
     <task id="LOCAL-00001" summary="Añadidas las imagenes de todas las piezas y el talbero ya se pinta con las piezas incluidas (Aún no se pueden mover las piezas)">
       <option name="closed" value="true" />
@@ -126,7 +131,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712393002333</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Añadida la lógica de restringir movimientos por jaque">
+      <option name="closed" value="true" />
+      <created>1712762240105</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1712762240105</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -138,10 +151,11 @@
     <MESSAGE value="Añadido deshacer movimientos al pulsar tecla z, y empezada la lógica para restringir movimientos de las piezas (segun si hacen jaque y por tipo de pieza)" />
     <MESSAGE value="Arreglado fallo en movimientos, cambio en getAllPossibleMoves (diccionario en vez de if enorme) y añadidos movimientos de peones, torres y rey.&#10;OJO: bug en casillas (3,4) y (4,3) no se porque" />
     <MESSAGE value="Cambio parte mal tabulada mov peones (sigue bug casillas), añadidos movimientos: alfil, caballo y reina. &#10;Añadido segundo clic en pieza mismo color guarda clic para mover esa pieza despues" />
-    <option name="LAST_COMMIT_MESSAGE" value="Cambio parte mal tabulada mov peones (sigue bug casillas), añadidos movimientos: alfil, caballo y reina. &#10;Añadido segundo clic en pieza mismo color guarda clic para mover esa pieza despues" />
+    <MESSAGE value="Añadida la lógica de restringir movimientos por jaque" />
+    <option name="LAST_COMMIT_MESSAGE" value="Añadida la lógica de restringir movimientos por jaque" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/ChessPython$ChessMain.coverage" NAME="ChessMain Coverage Results" MODIFIED="1712761880376" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
-    <SUITE FILE_PATH="coverage/ChessPython$ChessEngine.coverage" NAME="ChessEngine Coverage Results" MODIFIED="1712212552280" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
+    <SUITE FILE_PATH="coverage/ChessPython$ChessMain.coverage" NAME="ChessMain Coverage Results" MODIFIED="1713597857475" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
+    <SUITE FILE_PATH="coverage/ChessPython$ChessEngine.coverage" NAME="ChessEngine Coverage Results" MODIFIED="1713459821121" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
   </component>
 </project>

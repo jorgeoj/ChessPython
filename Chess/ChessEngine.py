@@ -34,6 +34,10 @@ class GameState():
         # El rey no tiene movimientos validos pero no está en jaque
         self.staleMate = False
         self.enpassantPossible = () # Coordeandas para la casilla donde en passant es posible
+        self.currentCastlingRight = CastleRights(True, True, True, True)
+        self.castleRightsLog = [CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks,
+                                             self.currentCastlingRight.wqs, self.currentCastlingRight.bqs)]
+
 
     """
     Coge un movimiento como parametro y lo ejecuta (No funciona para enrocar, en-passant y promoción)
@@ -64,6 +68,28 @@ class GameState():
         else:
             self.enpassantPossible = ()
 
+        # Enroque
+        if move.isCastleMove:
+            if move.endCol - move.startCol == 2: # Enroque por lado del rey
+                self.board[move.endRow][move.endCol-1] = self.board[move.endRow][move.endCol+1] # Mueve la torre
+                self.board[move.endRow][move.endCol+1] = '--' # Borra la torre antigua
+            else: # Enroque por lado de la reina
+                self.board[move.endRow][move.endCol+1] = self.board[move.endRow][move.endCol-2]
+                self.board[move.endRow][move.endCol-2] = '--'
+
+        # Actualizar posibilidad de enrocar (cuando es movimiento de rey o torre)
+        self.updateCastleRights(move)
+        self.castleRightsLog.append(CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks,
+                                             self.currentCastlingRight.wqs, self.currentCastlingRight.bqs))
+
+        # Deshacer el enroque
+        if move.isCastleMove:
+            if move.endCol - move.startCol == 2: # Lado del rey
+                self.board[move.endRow][move.endCol+1] = self.board[move.endRow][move.endCol-1]
+                self.board[move.endRow][move.endCol-1] = '--'
+            else: # Lado de la reina
+                self.board[move.endRow][move.endCol - 2] = self.board[move.endRow][move.endCol + 1]
+                self.board[move.endRow][move.endCol + 1] = '--'
 
     """
     Deshacer el ultimo movimiento hecho
@@ -88,15 +114,54 @@ class GameState():
             if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2:
                 self.enpassantPossible = ()
 
+            # Deshacer derecho a enrocar
+            self.castleRightsLog.pop() # librarse de los nuevos derechos del movimiento que estamos deshaciendo
+            self.currentCastlingRight = self.castleRightsLog[-1] # Seteamos los derechos a los ultimos de la lista
+
+
+    """
+    Actualizar los derechos de poder enrocar
+    """
+    def updateCastleRights(self, move):
+        if move.pieceMoved == 'wK':
+            self.currentCastlingRight.wks = False
+            self.currentCastlingRight.wqs = False
+        elif move.pieceMoved == 'bK':
+            self.currentCastlingRight.bks = False
+            self.currentCastlingRight.bqs = False
+        elif move.pieceMoved == 'wR':
+            if move.startRow == 7:
+                if move.startCol == 0: # Torre izquierda
+                    self.currentCastlingRight.wqs = False
+                elif move.startCol == 7: # Torre derecha
+                    self.currentCastlingRight.wks = False
+        elif move.pieceMoved == 'bR':
+            if move.startRow == 0:
+                if move.startCol == 0: # Torre izquierda
+                    self.currentCastlingRight.bqs = False
+                elif move.startCol == 7: # Torre derecha
+                    self.currentCastlingRight.bks = False
+
     """
     Todos los movimientos considerando jaque
     """
     def getValidMoves(self):
+        for log in self.castleRightsLog:
+            print(log.wks, log.wqs, log.bks, log.bqs, end= ", ")
+        print()
+
         tempEnpassantPossible = self.enpassantPossible
+        tempCastleRights = CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks,
+                                        self.currentCastlingRight.wqs, self.currentCastlingRight.bqs)
         # Generamos todos los movimientos posibles, para cada movimiento hacemos el movimiento, luego generamos todos
         # los movimientos del oponente y para cada uno de esos movimientos, miraremos si atacan al rey, si lo hacen
         # no será un movimiento valido
         moves = self.getAllPossibleMoves()
+        if self.whiteToMove:
+            self.getCastleMoves(self.whiteKingLocation[0], self.whiteKingLocation[1], moves)
+        else:
+            self.getCastleMoves(self.blackKingLocation[0], self.blackKingLocation[1], moves)
+
         for i in range(len(moves)-1, -1, -1): # Recorrer la lista del reves para que al borrar no de problemas
             self.makeMove(moves[i])
             self.whiteToMove = not self.whiteToMove
@@ -111,7 +176,7 @@ class GameState():
                 self.staleMate = True
 
         self.enpassantPossible = tempEnpassantPossible
-
+        self.currentCastlingRight = tempCastleRights
         return moves
 
     """
@@ -279,6 +344,37 @@ class GameState():
                 if endPiece[0] != colorAlly:
                     moves.append(Move((r, c), (endRow, endCol), self.board))
 
+    """
+    Generar todos los movimientos validos de enrocar para el rey y añadirlos a la lista de movimientos
+    """
+    def getCastleMoves(self, r, c, moves):
+        if self.squareUnderAttack(r, c):
+            return # No se puede enrocar si se esta en jaque
+        if (self.whiteToMove and self.currentCastlingRight.wks) or (not self.whiteToMove and self.currentCastlingRight.bks):
+            self.getKingsideCastleMoves(r, c, moves)
+        if (self.whiteToMove and self.currentCastlingRight.wqs) or (not self.whiteToMove and self.currentCastlingRight.bqs):
+            self.getQueensideCastleMoves(r, c, moves)
+
+
+    def getKingsideCastleMoves(self, r, c, moves):
+        if self.board[r][c+1] == '--' and self.board[r][c+2] == '--':
+            if not self.squareUnderAttack(r, c+1) and not self.squareUnderAttack(r, c+2):
+                moves.append(Move((r,c), (r, c+2), self.board, isCastleMove=True))
+
+    def getQueensideCastleMoves(self, r, c, moves):
+        if self.board[r][c-1] == '--' and self.board[r][c-2] == '--' and self.board[r][c-3] == '--':
+            if not self.squareUnderAttack(r, c - 1) and not self.squareUnderAttack(r, c - 2):
+                moves.append(Move((r, c), (r, c - 2), self.board, isCastleMove=True))
+
+class CastleRights():
+    #wks: white king side, bks: black king side, wqs: white queen side, bks: black queen side,
+    def __init__(self, wks, bks, wqs, bqs):
+        self.wks = wks
+        self.bks = bks
+        self.wqs = wqs
+        self.bqs = bqs
+
+
 class Move():
     # Mapea claves a valores Clave : Valor
     ranksToRows = {"1": 7, "2": 6, "3": 5, "4": 4,
@@ -288,7 +384,7 @@ class Move():
                    "e": 4, "f": 5, "g": 6, "h": 7}
     colsToFiles = {v: k for k, v in filesToCols.items()}
 
-    def __init__(self, startSq, endSq, board, isEnpassantMove = False):
+    def __init__(self, startSq, endSq, board, isEnpassantMove = False, isCastleMove = False):
         # Inicializa los atributos del movimiento
         self.startRow = startSq[0]
         self.startCol = startSq[1]
@@ -302,6 +398,8 @@ class Move():
         self.isEnpassantMove = isEnpassantMove
         if self.isEnpassantMove:
             self.pieceCaptured = 'wp' if self.pieceMoved == 'bp' else 'bp'
+        # Enrocar
+        self.isCastleMove = isCastleMove
 
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
         # print(self.moveID)
@@ -314,8 +412,6 @@ class Move():
             return  self.moveID == other.moveID
         return False
 
-
-
     def getChessNotation(self):
         # Devuelve la notación de ajedrez del movimiento (por ejemplo, "e2e4" para un movimiento de peón)
         return self.getRankFile(self.startRow, self.startCol) + self.getRankFile(self.endRow, self.endCol)
@@ -323,15 +419,3 @@ class Move():
     def getRankFile(self, r, c):
         # Convierte la posición de la fila y columna en notación de ajedrez (por ejemplo, "e4" para la casilla (3,4))
         return self.colsToFiles[c] + self.rowsToRanks[r]
-
-
-
-
-
-
-
-
-
-
-
-

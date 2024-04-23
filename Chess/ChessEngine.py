@@ -30,14 +30,13 @@ class GameState():
         self.whiteKingLocation = (7, 4)
         self.blackKingLocation = (0, 4)
         # El rey no tiene movimientos validos y está en jaque
-        self.checkMate = False
+        self.checkmate = False
         # El rey no tiene movimientos validos pero no está en jaque
-        self.staleMate = False
+        self.stalemate = False
         self.enpassantPossible = () # Coordeandas para la casilla donde en passant es posible
         self.currentCastlingRight = CastleRights(True, True, True, True)
         self.castleRightsLog = [CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks,
                                              self.currentCastlingRight.wqs, self.currentCastlingRight.bqs)]
-
 
     """
     Coge un movimiento como parametro y lo ejecuta (No funciona para enrocar, en-passant y promoción)
@@ -67,13 +66,15 @@ class GameState():
             self.enpassantPossible = ((move.startRow + move.endRow)//2, move.startCol)
         else:
             self.enpassantPossible = ()
-
         # Enroque
         if move.isCastleMove:
+            print("He entrado en movimiento enroque")
             if move.endCol - move.startCol == 2: # Enroque por lado del rey
+                print("Hey estoy pasando por enroque lado rey")
                 self.board[move.endRow][move.endCol-1] = self.board[move.endRow][move.endCol+1] # Mueve la torre
                 self.board[move.endRow][move.endCol+1] = '--' # Borra la torre antigua
             else: # Enroque por lado de la reina
+                print("Hey estoy pasando por enroque lado reina")
                 self.board[move.endRow][move.endCol+1] = self.board[move.endRow][move.endCol-2]
                 self.board[move.endRow][move.endCol-2] = '--'
 
@@ -171,9 +172,12 @@ class GameState():
             self.undoMove()
         if len(moves) == 0: # Esto significa que es jaque o estancamiento (rey ahogado)
             if self.inCheck():
-                self.checkMate = True
+                self.checkmate = True
             else:
-                self.staleMate = True
+                self.stalemate = True
+        else:
+            self.checkmate = False
+            self.stalemate = False
 
         self.enpassantPossible = tempEnpassantPossible
         self.currentCastlingRight = tempCastleRights

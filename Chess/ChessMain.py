@@ -32,11 +32,12 @@ def main():
     gs = ChessEngine.GameState() # Crea un objeto GameState para representar el estado del juego
     validMoves = gs.getValidMoves() # Generamos los movimientos validos y los guardamos en una lista
     moveMade = False # Variable flag para cuando un movimiento es hecho
-
+    animate = False # Flag para cuando haya que animar un movimiento
     loadImages() # Carga las imágenes de las piezas
     running = True
     sqSelected = () # Vble para saber el cuadrado seleccionado, inicialmente no hay ninguna (tuple)
     playerClicks = [] # Constancia de los clicks del jugador para mover las piezas (2 tuples)
+    gameOver = False
 
     while running:
         for e in p.event.get():
@@ -45,56 +46,102 @@ def main():
                 running = False
             # Al pulsar el raton
             elif e.type == p.MOUSEBUTTONDOWN:
-                location = p.mouse.get_pos() # Localizacion en ejes x e y del raton
-                col = location[0]//SQ_SIZE
-                row = location[1]//SQ_SIZE
-                # Si el jugador pulsa 2 veces la misma casilla, se deselecciona la casilla
-                if sqSelected == (col, row):
-                    sqSelected = ()
-                    playerClicks = [] # Limpiar clicks de jugador
-                else:
-                    sqSelected = (row, col)
-                    playerClicks.append(sqSelected)
-                # Si el jugador ha hecho click dos veces hacemos que se mueva la pieza
-                if len(playerClicks) == 2:
-                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                    print(move.getChessNotation())
-                    for i in range(len(validMoves)):
-                        if move == validMoves[i]:
-                            gs.makeMove(validMoves[i])
-                            moveMade = True
-                            # Reseteamos los clicks del jugador y lo seleccionado
-                            sqSelected = ()
-                            playerClicks = []
-                    if not moveMade:
-                        # Si nos equivocamos de pieza al hacer click y le damos a la que queremos mover en el segundo
-                        # se guarda el click para que haga el movimiento la segunda pieza clicada
-                        playerClicks = [sqSelected]
+                if not gameOver:
+                    location = p.mouse.get_pos() # Localizacion en ejes x e y del raton
+                    col = location[0]//SQ_SIZE
+                    row = location[1]//SQ_SIZE
+                    # Si el jugador pulsa 2 veces la misma casilla, se deselecciona la casilla
+                    if sqSelected == (col, row):
+                        sqSelected = ()
+                        playerClicks = [] # Limpiar clicks de jugador
+                    else:
+                        sqSelected = (row, col)
+                        playerClicks.append(sqSelected)
+                    # Si el jugador ha hecho click dos veces hacemos que se mueva la pieza
+                    if len(playerClicks) == 2:
+                        move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                        print(move.getChessNotation())
+                        for i in range(len(validMoves)):
+                            if move == validMoves[i]:
+                                gs.makeMove(validMoves[i])
+                                moveMade = True
+                                animate = True
+                                # Reseteamos los clicks del jugador y lo seleccionado
+                                sqSelected = ()
+                                playerClicks = []
+                        if not moveMade:
+                            # Si nos equivocamos de pieza al hacer click y le damos a la que queremos mover en el segundo
+                            # se guarda el click para que haga el movimiento la segunda pieza clicada
+                            playerClicks = [sqSelected]
             # Al pulsar una tecla
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z: # Deshacer movimiento con tecla "z" (se puede cambiar)
                     gs.undoMove()
                     moveMade = True
+                    animate = False
+                if e.key == p.K_r: # Resetear el tablero cuando se pulsa la letra "r"
+                    gs = ChessEngine.GameState()
+                    validMoves = gs.getValidMoves()
+                    sqSelected = ()
+                    playerClicks = []
+                    moveMade = False
+                    animate = False
 
         if moveMade:
+            if animate:
+                animateMove(gs.moveLog[-1], screen, gs.board, clock)
             validMoves = gs.getValidMoves()
             moveMade = False
+            animate = False
 
-        drawGameState(screen, gs) # Dibuja el estado actual del juego en la pantalla
+        drawGameState(screen, gs, validMoves, sqSelected) # Dibuja el estado actual del juego en la pantalla
+
+        if gs.checkmate:
+            gameOver = True
+            if gs.whiteToMove:
+                drawText(screen, 'Black wins by checkmate (R to restart)')
+            else:
+                drawText(screen, 'White wins by checkmate (R to restart)')
+        elif gs.stalemate:
+            gameOver = True
+            drawText(screen, 'Stalemate (R for restart)')
+
         clock.tick(MAX_FPS) # Controla la velocidad de actualización de la pantalla
         p.display.flip() # Actualiza la pantalla
 
 '''
+Resaltar la casilla seleccionada y los movimientos posibles de la pieza seleccionada
+'''
+def highlightSquares(screen, gs, validMoves, sqSelected):
+    if sqSelected != ():
+        r, c = sqSelected
+        if gs.board[r][c][0] == ('w' if gs.whiteToMove else 'b'): # Casilla seleccionada es una pieza que se puede mover
+            # Resaltar la casilla seleccionada
+            s = p.Surface((SQ_SIZE, SQ_SIZE))
+            s.set_alpha(100) # Valor de transparencia (0 transparente, 255 opaco)
+            s.fill(p.Color('blue'))
+            screen.blit(s, (c*SQ_SIZE, r*SQ_SIZE))
+            # Resaltar movimientos de esa casilla
+            s.fill(p.Color('yellow'))
+            for move in validMoves:
+                if move.startRow == r and move.startCol == c:
+                    screen.blit(s, (move.endCol*SQ_SIZE, move.endRow*SQ_SIZE))
+
+
+'''
 Responsable de todos los gráficos dentro del estado actual del juego.
 '''
-def drawGameState(screen, gs):
+def drawGameState(screen, gs, validMoves, sqSelected):
     drawBoard(screen) # Esto dibuja los cuadrados en el tablero
+    highlightSquares(screen, gs, validMoves, sqSelected)
     drawPieces(screen, gs.board) # Esto dibuja las piezas encima de los cuadrados del tablero
+
 
 '''
 Dibujar los cuadrados en el tablero. OJO: El cuadrado de arriba a la izquierda del tablero siempre es blanco
 '''
 def drawBoard(screen):
+    global colors
     colors = [p.Color("white"), p.Color("gray")] # Colores del tablero (se pueden cambiar mas adelante)
     # El primer for recorre filas, el segundo recorre columnas. Dibuja cada cuadrado del tablero
     for r in range(DIMENSION):
@@ -113,10 +160,42 @@ def drawPieces(screen, board):
             if piece != "--": # Nos aseguramos que no sea un cuadrado vacio, para dibujar la pieza
                 screen.blit(IMAGES[piece], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
+'''
+Animar los movimientos
+'''
+def animateMove(move, screen, board, clock):
+    global colors
+    dR = move.endRow - move.startRow
+    dC = move.endCol - move.startCol
+    framesPerSquare = 10 # Frames para mover una casilla
+    frameCount = (abs(dR) + abs(dC)) * framesPerSquare
+    for frame in range(frameCount + 1):
+        r, c = (move.startRow + dR*frame/frameCount, move.startCol + dC*frame/frameCount)
+        drawBoard(screen)
+        drawPieces(screen, board)
+        # Borrar la pieza movida de su casilla final
+        color = colors[(move.endRow + move.endCol) % 2]
+        endSquare = p.Rect(move.endCol*SQ_SIZE, move.endRow*SQ_SIZE, SQ_SIZE, SQ_SIZE)
+        p.draw.rect(screen, color, endSquare)
+        # Dibujar la pieza capturada en el rectangulo
+        if move.pieceCaptured != '--':
+            screen.blit(IMAGES[move.pieceCaptured], endSquare)
+        # Dibujar la pieza moviendose
+        screen.blit(IMAGES[move.pieceMoved], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+        p.display.flip()
+        clock.tick(60)
+
+def drawText(screen, text):
+    font = p.font.SysFont("Arial", 30, True, False) # Nombre fuente, tamaño, negrita, italica
+    textObject = font.render(text, 0, p.Color('Black'))
+    textLocation = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH/2 -textObject.get_width()/2, HEIGHT/2 - textObject.get_height()/2)
+    screen.blit(textObject, textLocation)
+    textObject = font.render(text, 0, p.Color('Yellow'))
+    screen.blit(textObject, textLocation.move(2, 2))
 
 if __name__ == "__main__":
     main() # Ejecuta la función main si este archivo es el programa principal
 
 
-
+# NOTA:Para mate rapido, mover: peon alfil blanco rey 1, peon rey negro 2, peon caballo blanco rey 2 y reina negra por la diagonal
 

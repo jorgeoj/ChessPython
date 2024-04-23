@@ -86,6 +86,7 @@ def main():
                     playerClicks = []
                     moveMade = False
                     animate = False
+                    gameOver = False
 
         if moveMade:
             if animate:

@@ -68,13 +68,10 @@ class GameState():
             self.enpassantPossible = ()
         # Enroque
         if move.isCastleMove:
-            print("He entrado en movimiento enroque")
             if move.endCol - move.startCol == 2: # Enroque por lado del rey
-                print("Hey estoy pasando por enroque lado rey")
                 self.board[move.endRow][move.endCol-1] = self.board[move.endRow][move.endCol+1] # Mueve la torre
                 self.board[move.endRow][move.endCol+1] = '--' # Borra la torre antigua
             else: # Enroque por lado de la reina
-                print("Hey estoy pasando por enroque lado reina")
                 self.board[move.endRow][move.endCol+1] = self.board[move.endRow][move.endCol-2]
                 self.board[move.endRow][move.endCol-2] = '--'
 
@@ -82,15 +79,6 @@ class GameState():
         self.updateCastleRights(move)
         self.castleRightsLog.append(CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks,
                                              self.currentCastlingRight.wqs, self.currentCastlingRight.bqs))
-
-        # Deshacer el enroque
-        if move.isCastleMove:
-            if move.endCol - move.startCol == 2: # Lado del rey
-                self.board[move.endRow][move.endCol+1] = self.board[move.endRow][move.endCol-1]
-                self.board[move.endRow][move.endCol-1] = '--'
-            else: # Lado de la reina
-                self.board[move.endRow][move.endCol - 2] = self.board[move.endRow][move.endCol + 1]
-                self.board[move.endRow][move.endCol + 1] = '--'
 
     """
     Deshacer el ultimo movimiento hecho
@@ -117,8 +105,17 @@ class GameState():
 
             # Deshacer derecho a enrocar
             self.castleRightsLog.pop() # librarse de los nuevos derechos del movimiento que estamos deshaciendo
-            self.currentCastlingRight = self.castleRightsLog[-1] # Seteamos los derechos a los ultimos de la lista
+            newRights = self.castleRightsLog[-1]
+            self.currentCastlingRight = CastleRights(newRights.wks, newRights.bks, newRights.wqs, newRights.bqs)
 
+            # Deshacer el enroque
+            if move.isCastleMove:
+                if move.endCol - move.startCol == 2:  # Lado del rey
+                    self.board[move.endRow][move.endCol + 1] = self.board[move.endRow][move.endCol - 1]
+                    self.board[move.endRow][move.endCol - 1] = '--'
+                else:  # Lado de la reina
+                    self.board[move.endRow][move.endCol - 2] = self.board[move.endRow][move.endCol + 1]
+                    self.board[move.endRow][move.endCol + 1] = '--'
 
     """
     Actualizar los derechos de poder enrocar
@@ -147,10 +144,6 @@ class GameState():
     Todos los movimientos considerando jaque
     """
     def getValidMoves(self):
-        for log in self.castleRightsLog:
-            print(log.wks, log.wqs, log.bks, log.bqs, end= ", ")
-        print()
-
         tempEnpassantPossible = self.enpassantPossible
         tempCastleRights = CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks,
                                         self.currentCastlingRight.wqs, self.currentCastlingRight.bqs)

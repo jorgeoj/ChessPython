@@ -3,7 +3,7 @@ Este es nuestro archivo principal. Será responsable de manejar la entrada del u
 """
 
 import pygame as p # Importa la biblioteca pygame
-from Chess import ChessEngine # Importa el módulo ChessEngine desde el paquete Chess
+from Chess import ChessEngine, SmartMoveFinder # Importa el módulo ChessEngine desde el paquete Chess
 
 WIDTH = HEIGHT = 512 # Define el ancho y alto de la ventana del juego
 DIMENSION = 8 # Define las dimensiones del tablero de ajedrez (8x8)
@@ -39,14 +39,18 @@ def main():
     playerClicks = [] # Constancia de los clicks del jugador para mover las piezas (2 tuples)
     gameOver = False
 
+    playerOne = True # Si el jugador juega blancas será verdadero si lo hace la IA será falso
+    playerTwo = False # Lo mismo de arriba pero con las negras
+
     while running:
+        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
             # Si el usuario cierra la ventana, detiene el bucle principal
             if e.type == p.QUIT:
                 running = False
             # Al pulsar el raton
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver:
+                if not gameOver and humanTurn:
                     location = p.mouse.get_pos() # Localizacion en ejes x e y del raton
                     col = location[0]//SQ_SIZE
                     row = location[1]//SQ_SIZE
@@ -87,6 +91,13 @@ def main():
                     moveMade = False
                     animate = False
                     gameOver = False
+
+        # Movimientos IA
+        if not gameOver and not humanTurn:
+            AIMove = SmartMoveFinder.findRandomMove(validMoves)
+            gs.makeMove(AIMove)
+            moveMade = True
+            animate = True
 
         if moveMade:
             if animate:

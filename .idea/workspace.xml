@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="10a920ac-7f3a-4e6f-aac3-00d77685f0d8" name="Changes" comment="Pequeño cambio, tras terminar partida y pulsar R poder hacer movimientos (no se podia antes)">
+    <list default="true" id="10a920ac-7f3a-4e6f-aac3-00d77685f0d8" name="Changes" comment="Arreglado el enrocar">
+      <change afterPath="$PROJECT_DIR$/Chess/SmartMoveFinder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Chess/ChessEngine.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/ChessEngine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Chess/ChessMain.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/ChessMain.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,7 +96,9 @@
       <workItem from="1713882993463" duration="8013000" />
       <workItem from="1714026129766" duration="1045000" />
       <workItem from="1714044953459" duration="592000" />
-      <workItem from="1714058300841" duration="619000" />
+      <workItem from="1714058300841" duration="953000" />
+      <workItem from="1714402861125" duration="2316000" />
+      <workItem from="1714552206343" duration="1868000" />
     </task>
     <task id="LOCAL-00001" summary="Añadidas las imagenes de todas las piezas y el talbero ya se pinta con las piezas incluidas (Aún no se pueden mover las piezas)">
       <option name="closed" value="true" />
@@ -177,7 +180,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713893036527</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Arreglado el enrocar">
+      <option name="closed" value="true" />
+      <created>1714059245060</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1714059245060</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -194,10 +205,11 @@
     <MESSAGE value="Cambios para enrocar (OJO: No se mueve la torre pero si el rey)" />
     <MESSAGE value="Añadidos:&#10;Resaltar casillas movimientos&#10;Animaciones mover las piezas&#10;Volver a empezar al pulsar R&#10;Texto jaque mate al terminar" />
     <MESSAGE value="Pequeño cambio, tras terminar partida y pulsar R poder hacer movimientos (no se podia antes)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Pequeño cambio, tras terminar partida y pulsar R poder hacer movimientos (no se podia antes)" />
+    <MESSAGE value="Arreglado el enrocar" />
+    <option name="LAST_COMMIT_MESSAGE" value="Arreglado el enrocar" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/ChessPython$ChessMain.coverage" NAME="ChessMain Coverage Results" MODIFIED="1714058404305" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
+    <SUITE FILE_PATH="coverage/ChessPython$ChessMain.coverage" NAME="ChessMain Coverage Results" MODIFIED="1714553774698" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
     <SUITE FILE_PATH="coverage/ChessPython$ChessEngine.coverage" NAME="ChessEngine Coverage Results" MODIFIED="1714044963679" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
   </component>
 </project>

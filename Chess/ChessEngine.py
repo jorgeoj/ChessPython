@@ -390,7 +390,7 @@ class Move():
         self.pieceMoved = board[self.startRow][self.startCol] # Pieza movida
         self.pieceCaptured = board[self.endRow][self.endCol] # Pieza capturada
         # Para la promocion del peon (en su metodo hay que repetir esto muchas veces)
-        self.isPawnPromotion = (self.pieceMoved == 'wp' and self.endRow == 0) or (self.pieceMoved == 'bp' and self.endCol == 7)
+        self.isPawnPromotion = (self.pieceMoved == 'wp' and self.endRow == 0) or (self.pieceMoved == 'bp' and self.endRow == 7)
         # Para el en passant
         self.isEnpassantMove = isEnpassantMove
         if self.isEnpassantMove:

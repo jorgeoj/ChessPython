@@ -116,6 +116,9 @@ class GameState():
                 else:  # Lado de la reina
                     self.board[move.endRow][move.endCol - 2] = self.board[move.endRow][move.endCol + 1]
                     self.board[move.endRow][move.endCol + 1] = '--'
+            # Para asegurarse que al ir atrás no se quede el estado
+            self.checkmate = False
+            self.stalemate = False
 
     """
     Actualizar los derechos de poder enrocar

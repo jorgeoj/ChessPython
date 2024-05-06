@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="10a920ac-7f3a-4e6f-aac3-00d77685f0d8" name="Changes" comment="Añadida IA muy básica que hace movimientos random (Aún hay que mejorarla)">
+    <list default="true" id="10a920ac-7f3a-4e6f-aac3-00d77685f0d8" name="Changes" comment="Arreglado bug de promoción, mejorada IA algoritmo con puntuaciones y calcular movimientos futuros">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Chess/ChessEngine.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/ChessEngine.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Chess/ChessMain.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/ChessMain.py" afterDir="false" />
@@ -34,23 +34,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.ChessEngine.executor": "Run",
-    "Python.ChessMain.executor": "Run",
-    "Python.SmartMoveFinder.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/jorge/PycharmProjects/ChessPython/images",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.ChessEngine.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ChessMain.executor&quot;: &quot;Run&quot;,
+    &quot;Python.SmartMoveFinder.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/jorge/PycharmProjects/ChessPython/images&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\jorge\PycharmProjects\ChessPython\images" />
@@ -102,7 +102,8 @@
       <workItem from="1714402861125" duration="2316000" />
       <workItem from="1714552206343" duration="2503000" />
       <workItem from="1714759477982" duration="601000" />
-      <workItem from="1714804937478" duration="7209000" />
+      <workItem from="1714804937478" duration="7607000" />
+      <workItem from="1715007470420" duration="2935000" />
     </task>
     <task id="LOCAL-00001" summary="Añadidas las imagenes de todas las piezas y el talbero ya se pinta con las piezas incluidas (Aún no se pueden mover las piezas)">
       <option name="closed" value="true" />
@@ -200,7 +201,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714554296622</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Arreglado bug de promoción, mejorada IA algoritmo con puntuaciones y calcular movimientos futuros">
+      <option name="closed" value="true" />
+      <created>1714816114574</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1714816114574</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -219,10 +228,11 @@
     <MESSAGE value="Pequeño cambio, tras terminar partida y pulsar R poder hacer movimientos (no se podia antes)" />
     <MESSAGE value="Arreglado el enrocar" />
     <MESSAGE value="Añadida IA muy básica que hace movimientos random (Aún hay que mejorarla)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Añadida IA muy básica que hace movimientos random (Aún hay que mejorarla)" />
+    <MESSAGE value="Arreglado bug de promoción, mejorada IA algoritmo con puntuaciones y calcular movimientos futuros" />
+    <option name="LAST_COMMIT_MESSAGE" value="Arreglado bug de promoción, mejorada IA algoritmo con puntuaciones y calcular movimientos futuros" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/ChessPython$ChessMain.coverage" NAME="ChessMain Coverage Results" MODIFIED="1714815844628" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
+    <SUITE FILE_PATH="coverage/ChessPython$ChessMain.coverage" NAME="ChessMain Coverage Results" MODIFIED="1715007772229" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
     <SUITE FILE_PATH="coverage/ChessPython$ChessEngine.coverage" NAME="ChessEngine Coverage Results" MODIFIED="1714044963679" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
     <SUITE FILE_PATH="coverage/ChessPython$SmartMoveFinder.coverage" NAME="SmartMoveFinder Coverage Results" MODIFIED="1714814757222" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
   </component>

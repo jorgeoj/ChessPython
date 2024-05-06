@@ -83,6 +83,7 @@ def main():
                     gs.undoMove()
                     moveMade = True
                     animate = False
+                    gameOver = False
                 if e.key == p.K_r: # Resetear el tablero cuando se pulsa la letra "r"
                     gs = ChessEngine.GameState()
                     validMoves = gs.getValidMoves()
@@ -94,7 +95,7 @@ def main():
 
         # Movimientos IA
         if not gameOver and not humanTurn:
-            AIMove = SmartMoveFinder.findBestMove(gs, validMoves)
+            AIMove = SmartMoveFinder.findBestMoveMinMax(gs, validMoves)
             if AIMove is None:
                 AIMove = SmartMoveFinder.findRandomMove(validMoves)
             gs.makeMove(AIMove)

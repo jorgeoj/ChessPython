@@ -34,6 +34,8 @@ class GameState():
         # El rey no tiene movimientos validos pero no está en jaque
         self.stalemate = False
         self.enpassantPossible = () # Coordeandas para la casilla donde en passant es posible
+        self.enPassantPossibleLog = [self.enpassantPossible]
+
         self.currentCastlingRight = CastleRights(True, True, True, True)
         self.castleRightsLog = [CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks,
                                              self.currentCastlingRight.wqs, self.currentCastlingRight.bqs)]
@@ -75,6 +77,8 @@ class GameState():
                 self.board[move.endRow][move.endCol+1] = self.board[move.endRow][move.endCol-2]
                 self.board[move.endRow][move.endCol-2] = '--'
 
+        self.enPassantPossibleLog.append(self.enpassantPossible)
+
         # Actualizar posibilidad de enrocar (cuando es movimiento de rey o torre)
         self.updateCastleRights(move)
         self.castleRightsLog.append(CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks,
@@ -98,10 +102,9 @@ class GameState():
             if move.isEnpassantMove:
                 self.board[move.endRow][move.endCol] = '--' # Dejamos donde se quedo el peon vacio
                 self.board[move.startRow][move.endCol] = move.pieceCaptured
-                self.enpassantPossible = (move.endRow, move.endCol)
-            # Dehacer avance de 2 casillas del peon
-            if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2:
-                self.enpassantPossible = ()
+
+            self.enPassantPossibleLog.pop()
+            self.enpassantPossible = self.enPassantPossibleLog[-1]
 
             # Deshacer derecho a enrocar
             self.castleRightsLog.pop() # librarse de los nuevos derechos del movimiento que estamos deshaciendo
@@ -116,6 +119,7 @@ class GameState():
                 else:  # Lado de la reina
                     self.board[move.endRow][move.endCol - 2] = self.board[move.endRow][move.endCol + 1]
                     self.board[move.endRow][move.endCol + 1] = '--'
+
             # Para asegurarse que al ir atrás no se quede el estado
             self.checkmate = False
             self.stalemate = False
@@ -141,6 +145,20 @@ class GameState():
                 if move.startCol == 0: # Torre izquierda
                     self.currentCastlingRight.bqs = False
                 elif move.startCol == 7: # Torre derecha
+                    self.currentCastlingRight.bks = False
+
+        # Si se ha capturado una torre
+        if move.pieceCaptured == 'wR':
+            if move.endRow == 7:
+                if move.endCol == 0:
+                    self.currentCastlingRight.wqs = False
+                elif move.endCol == 7:
+                    self.currentCastlingRight.wks = False
+        elif move.pieceCaptured == 'bR':
+            if move.endRow == 0:
+                if move.endCol == 0:
+                    self.currentCastlingRight.bqs = False
+                elif move.endCol == 7:
                     self.currentCastlingRight.bks = False
 
     """
@@ -394,12 +412,14 @@ class Move():
         self.pieceCaptured = board[self.endRow][self.endCol] # Pieza capturada
         # Para la promocion del peon (en su metodo hay que repetir esto muchas veces)
         self.isPawnPromotion = (self.pieceMoved == 'wp' and self.endRow == 0) or (self.pieceMoved == 'bp' and self.endRow == 7)
+        # Enrocar
+        self.isCastleMove = isCastleMove
         # Para el en passant
         self.isEnpassantMove = isEnpassantMove
         if self.isEnpassantMove:
             self.pieceCaptured = 'wp' if self.pieceMoved == 'bp' else 'bp'
-        # Enrocar
-        self.isCastleMove = isCastleMove
+
+        self.isCapture = self.pieceCaptured != '--'
 
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
         # print(self.moveID)
@@ -419,3 +439,26 @@ class Move():
     def getRankFile(self, r, c):
         # Convierte la posición de la fila y columna en notación de ajedrez (por ejemplo, "e4" para la casilla (3,4))
         return self.colsToFiles[c] + self.rowsToRanks[r]
+
+    # Override de la funcion str()
+    def __str__(self):
+        # Movimiento enroque
+        if self.isCastleMove:
+            # "O-O"  Enroque por lado de rey
+            # "O-O-O" Enroque por lado de reina
+            return "O-O" if self.endCol == 6 else "O-O-O"
+
+        endSquare = self.getRankFile(self.endRow, self.endCol)
+        # Movimientos de peones
+        if self.pieceMoved[1] == 'p':
+            if self.isCapture:
+                return self.colsToFiles[self.startCol] + "x" + endSquare
+            else:
+                return endSquare
+
+            #TODO: Promocion, dos piezas del mismo tipo a una casilla, jaque, y # para mate
+
+        moveString = self.pieceMoved[1]
+        if self.isCapture:
+            moveString += 'x'
+        return moveString + endSquare

@@ -5,9 +5,11 @@ Este es nuestro archivo principal. Será responsable de manejar la entrada del u
 import pygame as p # Importa la biblioteca pygame
 from Chess import ChessEngine, SmartMoveFinder # Importa el módulo ChessEngine desde el paquete Chess
 
-WIDTH = HEIGHT = 512 # Define el ancho y alto de la ventana del juego
+BOARD_WIDTH = BOARD_HEIGHT = 512 # Define el ancho y alto de la ventana del juego
+MOVE_LOG_PANEL_WIDTH = 275
+MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
 DIMENSION = 8 # Define las dimensiones del tablero de ajedrez (8x8)
-SQ_SIZE = HEIGHT // DIMENSION # Calcula el tamaño de cada cuadrado del tablero
+SQ_SIZE = BOARD_HEIGHT // DIMENSION # Calcula el tamaño de cada cuadrado del tablero
 MAX_FPS = 15 # Establece el máximo de fps para animaciones más adelante
 IMAGES = {} # Diccionario global para almacenar las imágenes de las piezas del ajedrez
 
@@ -26,9 +28,10 @@ El main de nuestro código. Se encargará de la entrada del usuario y de actuali
 '''
 def main():
     p.init() # Inicializa Pygame
-    screen = p.display.set_mode((WIDTH, HEIGHT)) # Crea la ventana del juego
+    screen = p.display.set_mode((BOARD_WIDTH + MOVE_LOG_PANEL_WIDTH, BOARD_HEIGHT)) # Crea la ventana del juego
     clock = p.time.Clock() # Objeto para controlar el tiempo del juego
     screen.fill(p.Color("white"))
+    moveLogFont = p.font.SysFont("Arial", 16, False, False)  # Nombre fuente, tamaño, negrita, italica
     gs = ChessEngine.GameState() # Crea un objeto GameState para representar el estado del juego
     validMoves = gs.getValidMoves() # Generamos los movimientos validos y los guardamos en una lista
     moveMade = False # Variable flag para cuando un movimiento es hecho
@@ -40,7 +43,7 @@ def main():
     gameOver = False
 
     playerOne = True # Si el jugador juega blancas será verdadero si lo hace la IA será falso
-    playerTwo = False # Lo mismo de arriba pero con las negras
+    playerTwo = True # Lo mismo de arriba pero con las negras
 
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
@@ -54,8 +57,8 @@ def main():
                     location = p.mouse.get_pos() # Localizacion en ejes x e y del raton
                     col = location[0]//SQ_SIZE
                     row = location[1]//SQ_SIZE
-                    # Si el jugador pulsa 2 veces la misma casilla, se deselecciona la casilla
-                    if sqSelected == (col, row):
+                    # Si el jugador pulsa 2 veces la misma casilla, se deselecciona la casilla o se hizo clic en el log
+                    if sqSelected == (col, row) or col >= 8:
                         sqSelected = ()
                         playerClicks = [] # Limpiar clicks de jugador
                     else:
@@ -109,20 +112,36 @@ def main():
             moveMade = False
             animate = False
 
-        drawGameState(screen, gs, validMoves, sqSelected) # Dibuja el estado actual del juego en la pantalla
+        drawGameState(screen, gs, validMoves, sqSelected, moveLogFont) # Dibuja el estado actual del juego en la pantalla
 
-        if gs.checkmate:
+        if gs.checkmate or gs.stalemate:
             gameOver = True
-            if gs.whiteToMove:
-                drawText(screen, 'Black wins by checkmate (R to restart)')
-            else:
-                drawText(screen, 'White wins by checkmate (R to restart)')
-        elif gs.stalemate:
-            gameOver = True
-            drawText(screen, 'Stalemate (R for restart)')
+            drawEndGameText(screen, 'Stalemate (R for restart)' if gs.stalemate else
+            'Black wins by checkmate (R to restart)' if gs.whiteToMove else 'White wins by checkmate (R to restart)')
 
         clock.tick(MAX_FPS) # Controla la velocidad de actualización de la pantalla
         p.display.flip() # Actualiza la pantalla
+
+'''
+Responsable de todos los gráficos dentro del estado actual del juego.
+'''
+def drawGameState(screen, gs, validMoves, sqSelected, moveLogFont):
+    drawBoard(screen) # Esto dibuja los cuadrados en el tablero
+    highlightSquares(screen, gs, validMoves, sqSelected)
+    drawPieces(screen, gs.board) # Esto dibuja las piezas encima de los cuadrados del tablero
+    drawMoveLog(screen, gs, moveLogFont)
+
+'''
+Dibujar los cuadrados en el tablero. OJO: El cuadrado de arriba a la izquierda del tablero siempre es blanco
+'''
+def drawBoard(screen):
+    global colors
+    colors = [p.Color("white"), p.Color("gray")] # Colores del tablero (se pueden cambiar mas adelante)
+    # El primer for recorre filas, el segundo recorre columnas. Dibuja cada cuadrado del tablero
+    for r in range(DIMENSION):
+        for c in range(DIMENSION):
+            color = colors[((r+c) % 2)] # Alterna los colores de los cuadrados para simular un tablero de ajedrez
+            p.draw.rect(screen, color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 '''
 Resaltar la casilla seleccionada y los movimientos posibles de la pieza seleccionada
@@ -142,29 +161,6 @@ def highlightSquares(screen, gs, validMoves, sqSelected):
                 if move.startRow == r and move.startCol == c:
                     screen.blit(s, (move.endCol*SQ_SIZE, move.endRow*SQ_SIZE))
 
-
-'''
-Responsable de todos los gráficos dentro del estado actual del juego.
-'''
-def drawGameState(screen, gs, validMoves, sqSelected):
-    drawBoard(screen) # Esto dibuja los cuadrados en el tablero
-    highlightSquares(screen, gs, validMoves, sqSelected)
-    drawPieces(screen, gs.board) # Esto dibuja las piezas encima de los cuadrados del tablero
-
-
-'''
-Dibujar los cuadrados en el tablero. OJO: El cuadrado de arriba a la izquierda del tablero siempre es blanco
-'''
-def drawBoard(screen):
-    global colors
-    colors = [p.Color("white"), p.Color("gray")] # Colores del tablero (se pueden cambiar mas adelante)
-    # El primer for recorre filas, el segundo recorre columnas. Dibuja cada cuadrado del tablero
-    for r in range(DIMENSION):
-        for c in range(DIMENSION):
-            color = colors[((r+c) % 2)] # Alterna los colores de los cuadrados para simular un tablero de ajedrez
-            p.draw.rect(screen, color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
-
-
 '''
 Dibujar las piezas en el tablero usando el GameState.board actual
 '''
@@ -174,6 +170,35 @@ def drawPieces(screen, board):
             piece = board[r][c] # Obtiene la pieza en la posición (r, c) del tablero
             if piece != "--": # Nos aseguramos que no sea un cuadrado vacio, para dibujar la pieza
                 screen.blit(IMAGES[piece], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
+'''
+Dibujar el log de los movimientos
+'''
+def drawMoveLog(screen, gs, font):
+    moveLogRect = p.Rect(BOARD_WIDTH, 0, MOVE_LOG_PANEL_WIDTH, MOVE_LOG_PANEL_HEIGHT)
+    p.draw.rect(screen, p.Color("black"), moveLogRect)
+    moveLog = gs.moveLog
+    moveTexts = []
+    for i in range(0, len(moveLog), 2):
+        moveString = str(i//2 + 1) + ". " + str(moveLog[i]) + " "
+        if i + 1 < len(moveLog): # Para asegurarse que las negras también han movido
+            moveString += str(moveLog[i+1])
+        moveTexts.append(moveString)
+
+    movesPerRow = 3
+    padding = 5
+    lineSpacing = 2
+    textY = padding
+
+    for i in range(0, len(moveTexts), movesPerRow):
+        text = ""
+        for j in range(movesPerRow):
+            if i + j < len(moveTexts):
+                text += moveTexts[i+j]+ "  "
+        textObject = font.render(text, True, p.Color('green')) # Color de las letras de log (probar white tambien)
+        textLocation = moveLogRect.move(padding, textY)
+        screen.blit(textObject, textLocation)
+        textY += textObject.get_height() + lineSpacing
 
 '''
 Animar los movimientos
@@ -194,16 +219,19 @@ def animateMove(move, screen, board, clock):
         p.draw.rect(screen, color, endSquare)
         # Dibujar la pieza capturada en el rectangulo
         if move.pieceCaptured != '--':
+            if move.isEnpassantMove:
+                enPassantRow = move.endRow + 1 if move.pieceCaptured[0] == 'b' else move.endRow - 1
+                endSquare = p.Rect(move.endCol * SQ_SIZE, enPassantRow * SQ_SIZE, SQ_SIZE, SQ_SIZE)
             screen.blit(IMAGES[move.pieceCaptured], endSquare)
         # Dibujar la pieza moviendose
         screen.blit(IMAGES[move.pieceMoved], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
         p.display.flip()
         clock.tick(60)
 
-def drawText(screen, text):
+def drawEndGameText(screen, text):
     font = p.font.SysFont("Arial", 30, True, False) # Nombre fuente, tamaño, negrita, italica
     textObject = font.render(text, 0, p.Color('Black'))
-    textLocation = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH/2 -textObject.get_width()/2, HEIGHT/2 - textObject.get_height()/2)
+    textLocation = p.Rect(0, 0, BOARD_WIDTH, BOARD_HEIGHT).move(BOARD_WIDTH / 2 - textObject.get_width() / 2, BOARD_HEIGHT / 2 - textObject.get_height() / 2)
     screen.blit(textObject, textLocation)
     textObject = font.render(text, 0, p.Color('Yellow'))
     screen.blit(textObject, textLocation.move(2, 2))

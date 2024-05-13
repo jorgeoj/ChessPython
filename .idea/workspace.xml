@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="10a920ac-7f3a-4e6f-aac3-00d77685f0d8" name="Changes" comment="Añadido algoritmo negamax para hacer más eficiente la IA">
+    <list default="true" id="10a920ac-7f3a-4e6f-aac3-00d77685f0d8" name="Changes" comment="Arreglado bug enrocar con pieza de otro color, captura al paso deshacer movimiento, cambiada animación captura al paso, añadido log al lado del tablero, override str para mejor notacion de movimientos para el log">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Chess/ChessEngine.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/ChessEngine.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Chess/ChessMain.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/ChessMain.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -105,7 +104,8 @@
       <workItem from="1715007470420" duration="3359000" />
       <workItem from="1715091566047" duration="5046000" />
       <workItem from="1715268629435" duration="947000" />
-      <workItem from="1715495783326" duration="8714000" />
+      <workItem from="1715495783326" duration="9241000" />
+      <workItem from="1715617395852" duration="795000" />
     </task>
     <task id="LOCAL-00001" summary="Añadidas las imagenes de todas las piezas y el talbero ya se pinta con las piezas incluidas (Aún no se pueden mover las piezas)">
       <option name="closed" value="true" />
@@ -227,7 +227,15 @@
       <option name="project" value="LOCAL" />
       <updated>1715096781608</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Arreglado bug enrocar con pieza de otro color, captura al paso deshacer movimiento, cambiada animación captura al paso, añadido log al lado del tablero, override str para mejor notacion de movimientos para el log">
+      <option name="closed" value="true" />
+      <created>1715507930706</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1715507930706</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -249,10 +257,11 @@
     <MESSAGE value="Arreglado bug de promoción, mejorada IA algoritmo con puntuaciones y calcular movimientos futuros" />
     <MESSAGE value="Arreglados bugs de terminar partida un movimiento antes de jaque, deshacer movimiento y empezado a optimizar ia movimientos (Ahora mismo es muy lenta)" />
     <MESSAGE value="Añadido algoritmo negamax para hacer más eficiente la IA" />
-    <option name="LAST_COMMIT_MESSAGE" value="Añadido algoritmo negamax para hacer más eficiente la IA" />
+    <MESSAGE value="Arreglado bug enrocar con pieza de otro color, captura al paso deshacer movimiento, cambiada animación captura al paso, añadido log al lado del tablero, override str para mejor notacion de movimientos para el log" />
+    <option name="LAST_COMMIT_MESSAGE" value="Arreglado bug enrocar con pieza de otro color, captura al paso deshacer movimiento, cambiada animación captura al paso, añadido log al lado del tablero, override str para mejor notacion de movimientos para el log" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/ChessPython$ChessMain.coverage" NAME="ChessMain Coverage Results" MODIFIED="1715507502972" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
+    <SUITE FILE_PATH="coverage/ChessPython$ChessMain.coverage" NAME="ChessMain Coverage Results" MODIFIED="1715618289804" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
     <SUITE FILE_PATH="coverage/ChessPython$ChessEngine.coverage" NAME="ChessEngine Coverage Results" MODIFIED="1714044963679" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
     <SUITE FILE_PATH="coverage/ChessPython$SmartMoveFinder.coverage" NAME="SmartMoveFinder Coverage Results" MODIFIED="1714814757222" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Chess" />
   </component>

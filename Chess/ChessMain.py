@@ -58,7 +58,8 @@ def main():
                     col = location[0]//SQ_SIZE
                     row = location[1]//SQ_SIZE
                     # Si el jugador pulsa 2 veces la misma casilla, se deselecciona la casilla o se hizo clic en el log
-                    if sqSelected == (col, row) or col >= 8:
+                    # if sqSelected == (col, row) or col >= 8: (Anterior parece que el de abajo soluciona los bugs)
+                    if sqSelected == (row, col) or col >= 8:
                         sqSelected = ()
                         playerClicks = [] # Limpiar clicks de jugador
                     else:

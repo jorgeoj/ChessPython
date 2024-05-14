@@ -5,6 +5,8 @@ Este es nuestro archivo principal. Será responsable de manejar la entrada del u
 import pygame as p # Importa la biblioteca pygame
 from Chess import ChessEngine, SmartMoveFinder # Importa el módulo ChessEngine desde el paquete Chess
 
+import easygui
+
 BOARD_WIDTH = BOARD_HEIGHT = 512 # Define el ancho y alto de la ventana del juego
 MOVE_LOG_PANEL_WIDTH = 350
 MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
@@ -42,8 +44,10 @@ def main():
     playerClicks = [] # Constancia de los clicks del jugador para mover las piezas (2 tuples)
     gameOver = False
 
-    playerOne = True # Si el jugador juega blancas será verdadero si lo hace la IA será falso
-    playerTwo = False # Lo mismo de arriba pero con las negras
+    #playerOne = True # Si el jugador juega blancas será verdadero si lo hace la IA será falso
+    #playerTwo = False # Lo mismo de arriba pero con las negras
+
+    selectPlayer()
 
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
@@ -96,6 +100,7 @@ def main():
                     moveMade = False
                     animate = False
                     gameOver = False
+                    selectPlayer()
 
         # Movimientos IA
         if not gameOver and not humanTurn:
@@ -122,6 +127,50 @@ def main():
 
         clock.tick(MAX_FPS) # Controla la velocidad de actualización de la pantalla
         p.display.flip() # Actualiza la pantalla
+
+
+'''
+def selectPlayer():
+    global playerOne, playerTwo
+    while True:
+        choice = input("¿Quieres jugar contra la máquina (pulsa 1) o con alguien (pulsa 2)?")
+        if choice == '1':
+            choiceAI = input("Deseas jugar como blancas (pulsa 3) o negras (pulsa 4)")
+            if choiceAI == '3':
+                playerOne = True
+                playerTwo = False
+                break
+            elif choiceAI == '4':
+                playerOne = False
+                playerTwo = True
+                break
+            else:
+                print("Seleccione una opción correcta por favor")
+        elif choice == '2':
+            playerOne = True
+            playerTwo = True
+            break
+        else:
+            print("Seleccione una opción correcta por favor")
+'''
+def selectPlayer():
+    global playerOne, playerTwo
+    choice = easygui.buttonbox(msg="¿Quieres jugar contra la máquina o con alguien?",
+                                title="Selección de Jugadores",
+                                choices=["Contra la máquina", "Con alguien"])
+    if choice == "Contra la máquina":
+        choiceAI = easygui.buttonbox(msg="¿Qué color quieres jugar?",
+                                     title="Selección de Color",
+                                     choices=["Blancas", "Negras"])
+        if choiceAI == "Blancas":
+            playerOne = True
+            playerTwo = False
+        elif choiceAI == "Negras":
+            playerOne = False
+            playerTwo = True
+    elif choice == "Con alguien":
+        playerOne = True
+        playerTwo = True
 
 '''
 Responsable de todos los gráficos dentro del estado actual del juego.

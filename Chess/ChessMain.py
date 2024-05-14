@@ -6,7 +6,7 @@ import pygame as p # Importa la biblioteca pygame
 from Chess import ChessEngine, SmartMoveFinder # Importa el módulo ChessEngine desde el paquete Chess
 
 BOARD_WIDTH = BOARD_HEIGHT = 512 # Define el ancho y alto de la ventana del juego
-MOVE_LOG_PANEL_WIDTH = 275
+MOVE_LOG_PANEL_WIDTH = 350
 MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
 DIMENSION = 8 # Define las dimensiones del tablero de ajedrez (8x8)
 SQ_SIZE = BOARD_HEIGHT // DIMENSION # Calcula el tamaño de cada cuadrado del tablero
@@ -21,7 +21,7 @@ def loadImages():
     for piece in pieces:
         # Carga las imágenes de las piezas y las escala al tamaño del cuadrado del tablero
         IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE))
-    # OJO:Podemos acceder a imagenes también poniendo: IMAGES['wp'] (wp como ejemplo de cada pieza)
+    # OJO: Podemos acceder a imagenes también poniendo: IMAGES['wp'] (wp como ejemplo de cada pieza)
 
 '''
 El main de nuestro código. Se encargará de la entrada del usuario y de actualizar los gráficos.
@@ -43,7 +43,7 @@ def main():
     gameOver = False
 
     playerOne = True # Si el jugador juega blancas será verdadero si lo hace la IA será falso
-    playerTwo = True # Lo mismo de arriba pero con las negras
+    playerTwo = False # Lo mismo de arriba pero con las negras
 
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
@@ -186,7 +186,7 @@ def drawMoveLog(screen, gs, font):
             moveString += str(moveLog[i+1])
         moveTexts.append(moveString)
 
-    movesPerRow = 3
+    movesPerRow = 5
     padding = 5
     lineSpacing = 2
     textY = padding

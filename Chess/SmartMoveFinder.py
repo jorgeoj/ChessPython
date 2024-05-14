@@ -1,6 +1,70 @@
 import random
 
 pieceScore = {"K": 0, "Q": 10, "R": 5, "B": 3, "N": 3, "p": 1}
+
+# Evaluacion de puntuacion para los caballos (mejor que no se vayan a las columnas 1 o 8) y otras piezas
+knightScore = [[1, 1, 1, 1, 1, 1, 1, 1],
+               [1, 2, 2, 2, 2, 2, 2, 1],
+               [1, 2, 3, 3, 3, 3, 2, 1],
+               [1, 2, 3, 4, 4, 3, 2, 1],
+               [1, 2, 3, 4, 4, 3, 2, 1],
+               [1, 2, 3, 3, 3, 3, 2, 1],
+               [1, 2, 2, 2, 2, 2, 2, 1],
+               [1, 1, 1, 1, 1, 1, 1, 1]]
+
+# Buscamos las diagonales con los alfiles
+bishopScores = [[4, 3, 2, 1, 1, 2, 3, 4],
+               [3, 4, 3, 2, 2, 3, 4, 3],
+               [2, 3, 4, 3, 3, 4, 3, 2],
+               [1, 2, 3, 4, 4, 3, 2, 1],
+               [1, 2, 3, 4, 4, 3, 2, 1],
+               [2, 3, 4, 3, 3, 4, 3, 2],
+               [3, 4, 3, 2, 2, 3, 4, 3],
+               [4, 3, 2, 1, 1, 2, 3, 4]]
+
+# Cuanto mas por el centro la reina mejor
+queenScores = [[1, 1, 1, 3, 1, 1, 1, 1],
+               [1, 2, 3, 3, 3, 1, 1, 1],
+               [1, 4, 3, 3, 3, 4, 2, 1],
+               [1, 2, 3, 3, 3, 2, 2, 1],
+               [1, 2, 3, 3, 3, 2, 2, 1],
+               [1, 4, 3, 3, 3, 4, 2, 1],
+               [1, 1, 2, 3, 3, 1, 1, 1],
+               [1, 1, 1, 3, 1, 1, 1, 1]]
+
+# TODO revisar esta porque se mueve demasiado la torre
+rookScores = [[6, 3, 4, 4, 4, 4, 3, 6],
+               [1, 4, 4, 4, 4, 4, 4, 1],
+               [1, 1, 2, 3, 3, 2, 1, 1],
+               [1, 2, 3, 4, 4, 3, 2, 1],
+               [1, 2, 3, 4, 4, 3, 2, 1],
+               [1, 1, 2, 3, 3, 2, 1, 1],
+               [1, 4, 4, 4, 4, 4, 4, 1],
+               [6, 3, 4, 4, 4, 4, 3, 6]]
+
+whitePawnScores = [[8, 8, 8, 8, 8, 8, 8, 8],
+               [8, 8, 8, 8, 8, 8, 8, 8],
+               [5, 6, 6, 7, 7, 6, 6, 5],
+               [2, 3, 3, 5, 5, 3, 3, 2],
+               [1, 2, 3, 4, 4, 3, 2, 1],
+               [1, 1, 2, 3, 3, 2, 1, 1],
+               [0, 1, 1, 0, 0, 1, 1, 0],
+               [0, 0, 0, 0, 0, 0, 0, 0]]
+
+blackPawnScores = [[0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 1, 1, 0, 0, 1, 1, 0],
+               [1, 1, 2, 3, 3, 2, 1, 1],
+               [1, 2, 3, 4, 4, 3, 2, 1],
+               [1, 3, 3, 5, 5, 3, 3, 1],
+               [5, 6, 6, 7, 7, 6, 6, 5],
+               [8, 8, 8, 8, 8, 8, 8, 8],
+               [8, 8, 8, 8, 8, 8, 8, 8]]
+
+
+piecePositionScores = {"N": knightScore, "Q": queenScores, "B": bishopScores, "R": rookScores, "bp": blackPawnScores,
+                       "wp": whitePawnScores}
+
+
 CHECKMATE = 1000
 STALEMATE = 0
 DEPTH = 2 # Movimientos a futuro a calcular
@@ -155,12 +219,22 @@ def scoreBoard(gs):
         return STALEMATE
 
     score = 0
-    for row in gs.board:
-        for square in row:
-            if square[0] == 'w':
-                score += pieceScore[square[1]]
-            elif square[0] == 'b':
-                score -= pieceScore[square[1]]
+    for row in range(len(gs.board)):
+        for col in range(len(gs.board[row])):
+            square = gs.board[row][col]
+            if square != "--":
+                piecePositionScore = 0
+                # Puntuarlo por posiciones
+                if square[1] != "K": # Si no es un rey (ya que no se ha implementado puntuacion por el)
+                    if square[1] == "p": # para peones
+                        piecePositionScore = piecePositionScores[square][row][col]
+                    else: # para el resto de piezas
+                        piecePositionScore = piecePositionScores[square[1]][row][col]
+
+                if square[0] == 'w':
+                    score += pieceScore[square[1]] + piecePositionScore * .1 # Multiplicarlo por .1 para que siga teniendo en cuenta las otras casillas
+                elif square[0] == 'b':
+                    score -= pieceScore[square[1]] - piecePositionScore * .1
 
     return score
 

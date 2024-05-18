@@ -340,7 +340,6 @@ class GameState():
     """
     Obtener todos los movimientos de la reina en la fila y columna y añadir los movimientos a la lista "moves"
     """
-
     def getQueenMoves(self, r, c, moves):
         # Los movimientos de la reina son los de un alfil y una torre juntos
         self.getRookMoves(r, c, moves)
@@ -455,8 +454,6 @@ class Move():
                 return self.colsToFiles[self.startCol] + "x" + endSquare
             else:
                 return endSquare
-
-            #TODO: Promocion, dos piezas del mismo tipo a una casilla, jaque, y # para mate
 
         moveString = self.pieceMoved[1]
         if self.isCapture:

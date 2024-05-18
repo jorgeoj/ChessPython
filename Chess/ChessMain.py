@@ -8,7 +8,7 @@ from Chess import ChessEngine, SmartMoveFinder # Importa el módulo ChessEngine 
 import easygui
 
 BOARD_WIDTH = BOARD_HEIGHT = 512 # Define el ancho y alto de la ventana del juego
-MOVE_LOG_PANEL_WIDTH = 350
+MOVE_LOG_PANEL_WIDTH = 425
 MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
 DIMENSION = 8 # Define las dimensiones del tablero de ajedrez (8x8)
 SQ_SIZE = BOARD_HEIGHT // DIMENSION # Calcula el tamaño de cada cuadrado del tablero
@@ -87,11 +87,12 @@ def main():
                             playerClicks = [sqSelected]
             # Al pulsar una tecla
             elif e.type == p.KEYDOWN:
-                if e.key == p.K_z: # Deshacer movimiento con tecla "z" (se puede cambiar)
-                    gs.undoMove()
-                    moveMade = True
-                    animate = False
-                    gameOver = False
+                if undoMoveEnabled:
+                    if e.key == p.K_z: # Deshacer movimiento con tecla "z" (se puede cambiar)
+                        gs.undoMove()
+                        moveMade = True
+                        animate = False
+                        gameOver = False
                 if e.key == p.K_r: # Resetear el tablero cuando se pulsa la letra "r"
                     gs = ChessEngine.GameState()
                     validMoves = gs.getValidMoves()
@@ -128,33 +129,9 @@ def main():
         clock.tick(MAX_FPS) # Controla la velocidad de actualización de la pantalla
         p.display.flip() # Actualiza la pantalla
 
-
-'''
 def selectPlayer():
     global playerOne, playerTwo
-    while True:
-        choice = input("¿Quieres jugar contra la máquina (pulsa 1) o con alguien (pulsa 2)?")
-        if choice == '1':
-            choiceAI = input("Deseas jugar como blancas (pulsa 3) o negras (pulsa 4)")
-            if choiceAI == '3':
-                playerOne = True
-                playerTwo = False
-                break
-            elif choiceAI == '4':
-                playerOne = False
-                playerTwo = True
-                break
-            else:
-                print("Seleccione una opción correcta por favor")
-        elif choice == '2':
-            playerOne = True
-            playerTwo = True
-            break
-        else:
-            print("Seleccione una opción correcta por favor")
-'''
-def selectPlayer():
-    global playerOne, playerTwo
+    global undoMoveEnabled
     choice = easygui.buttonbox(msg="¿Quieres jugar contra la máquina o con alguien?",
                                 title="Selección de Jugadores",
                                 choices=["Contra la máquina", "Con alguien"])
@@ -168,9 +145,11 @@ def selectPlayer():
         elif choiceAI == "Negras":
             playerOne = False
             playerTwo = True
+        undoMoveEnabled = False
     elif choice == "Con alguien":
         playerOne = True
         playerTwo = True
+        undoMoveEnabled = True
 
 '''
 Responsable de todos los gráficos dentro del estado actual del juego.
@@ -186,7 +165,8 @@ Dibujar los cuadrados en el tablero. OJO: El cuadrado de arriba a la izquierda d
 '''
 def drawBoard(screen):
     global colors
-    colors = [p.Color("white"), p.Color("gray")] # Colores del tablero (se pueden cambiar mas adelante)
+    #colors = [p.Color("white"), p.Color("gray")] # Colores del tablero (blanco y gris)
+    colors = [p.Color("#dfc07f"), p.Color("#7a4f37")] # Colores del tablero (marron y clarito)
     # El primer for recorre filas, el segundo recorre columnas. Dibuja cada cuadrado del tablero
     for r in range(DIMENSION):
         for c in range(DIMENSION):

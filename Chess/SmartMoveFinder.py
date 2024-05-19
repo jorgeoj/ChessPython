@@ -5,10 +5,10 @@ pieceScore = {"K": 0, "Q": 10, "R": 5, "B": 3, "N": 3, "p": 1}
 # Evaluacion de puntuacion para los caballos (mejor que no se vayan a las columnas 1 o 8) y otras piezas
 knightScore = [[1, 1, 1, 1, 1, 1, 1, 1],
                [1, 2, 2, 2, 2, 2, 2, 1],
-               [1, 2, 3, 3, 3, 3, 2, 1],
-               [1, 2, 3, 4, 4, 3, 2, 1],
-               [1, 2, 3, 4, 4, 3, 2, 1],
-               [1, 2, 3, 3, 3, 3, 2, 1],
+               [1000, 2, 3, 3, 3, 3, 2, 1000],
+               [-1, 2, 3, 4, 4, 3, 2, -1],
+               [-1, 2, 3, 4, 4, 3, 2, -1],
+               [-1, 2, 3, 3, 3, 3, 2, -1],
                [1, 2, 2, 2, 2, 2, 2, 1],
                [1, 1, 1, 1, 1, 1, 1, 1]]
 
@@ -32,15 +32,14 @@ queenScores = [[1, 1, 1, 3, 1, 1, 1, 1],
                [1, 1, 2, 3, 3, 1, 1, 1],
                [1, 1, 1, 3, 1, 1, 1, 1]]
 
-# TODO revisar esta porque se mueve demasiado la torre
-rookScores = [[6, 3, 4, 4, 4, 4, 3, 6],
+rookScores = [[6, 2, 4, 4, 4, 4, 2, 6],
                [1, 4, 4, 4, 4, 4, 4, 1],
                [1, 1, 2, 3, 3, 2, 1, 1],
                [1, 2, 3, 4, 4, 3, 2, 1],
                [1, 2, 3, 4, 4, 3, 2, 1],
                [1, 1, 2, 3, 3, 2, 1, 1],
                [1, 4, 4, 4, 4, 4, 4, 1],
-               [6, 3, 4, 4, 4, 4, 3, 6]]
+               [6, 2, 4, 4, 4, 4, 2, 6]]
 
 whitePawnScores = [[8, 8, 8, 8, 8, 8, 8, 8],
                [8, 8, 8, 8, 8, 8, 8, 8],
@@ -64,11 +63,9 @@ blackPawnScores = [[0, 0, 0, 0, 0, 0, 0, 0],
 piecePositionScores = {"N": knightScore, "Q": queenScores, "B": bishopScores, "R": rookScores, "bp": blackPawnScores,
                        "wp": whitePawnScores}
 
-
 CHECKMATE = 1000
 STALEMATE = 0
 DEPTH = 2 # Movimientos a futuro a calcular
-
 
 '''
 Coge un movimiento aleatorio de la lista y lo devuelve
@@ -121,47 +118,12 @@ def findBestMove(gs, validMoves):
     nextMove = None
     random.shuffle(validMoves)
     counter = 0 # Para ver la diferencia de movimientos calculados entre un metodo y otro
-    # findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
-    #findMoveNegaMax(gs, validMoves, DEPTH, 1 if gs.whiteToMove else -1)
     findMoveNegaMaxAlphaBeta(gs, validMoves, DEPTH, -CHECKMATE, CHECKMATE, 1 if gs.whiteToMove else -1)
     print(counter)
 
     return nextMove
 
 '''
-def findMoveMinMax(gs, validMoves, depth, whiteToMove):
-    global nextMove
-    if depth == 0:
-        return scoreMaterial(gs.board)
-
-    if whiteToMove:
-        maxScore = -CHECKMATE
-        for move in validMoves:
-            gs.makeMove(move)
-            nextMoves = gs.getValidMoves()
-            score = findMoveMinMax(gs, nextMoves, depth - 1, False)
-            if score > maxScore:
-                maxScore = score
-                if depth == DEPTH:
-                    nextMove = move
-            gs.undoMove()
-        return maxScore
-
-    else:
-        minScore = CHECKMATE
-        for move in validMoves:
-            gs.makeMove(move)
-            nextMoves = gs.getValidMoves()
-            score = findMoveMinMax(gs, nextMoves, depth - 1, True)
-            if score < minScore:
-                minScore = score
-                if depth == DEPTH:
-                    nextMove = move
-            gs.undoMove()
-        return minScore
-'''
-
-
 def findMoveNegaMax(gs, validMoves, depth, turnMultiplier):
     global nextMove, counter
     counter += 1
@@ -179,8 +141,7 @@ def findMoveNegaMax(gs, validMoves, depth, turnMultiplier):
                 nextMove = move
         gs.undoMove()
     return maxScore
-
-
+'''
 
 def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier):
     global nextMove, counter
@@ -251,9 +212,3 @@ def scoreMaterial(board):
                 score -= pieceScore[square[1]]
 
     return score
-
-
-
-
-
-

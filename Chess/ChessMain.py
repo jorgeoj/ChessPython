@@ -8,7 +8,7 @@ from Chess import ChessEngine, SmartMoveFinder # Importa el módulo ChessEngine 
 import easygui
 
 BOARD_WIDTH = BOARD_HEIGHT = 512 # Define el ancho y alto de la ventana del juego
-MOVE_LOG_PANEL_WIDTH = 425
+MOVE_LOG_PANEL_WIDTH = 450
 MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
 DIMENSION = 8 # Define las dimensiones del tablero de ajedrez (8x8)
 SQ_SIZE = BOARD_HEIGHT // DIMENSION # Calcula el tamaño de cada cuadrado del tablero
@@ -123,29 +123,43 @@ def main():
 
         if gs.checkmate or gs.stalemate:
             gameOver = True
-            drawEndGameText(screen, 'Stalemate (R for restart)' if gs.stalemate else
-            'Black wins by checkmate (R to restart)' if gs.whiteToMove else 'White wins by checkmate (R to restart)')
+            drawEndGameText(screen, 'Ahogamiento (R para reiniciar)' if gs.stalemate else
+            'Negras ganan por mate (R para reiniciar)' if gs.whiteToMove else 'Blancas ganan por mate (R para reiniciar)')
 
         clock.tick(MAX_FPS) # Controla la velocidad de actualización de la pantalla
         p.display.flip() # Actualiza la pantalla
 
+'''
+Responsable de los valores de decidir como se jugará
+'''
 def selectPlayer():
-    global playerOne, playerTwo
-    global undoMoveEnabled
-    choice = easygui.buttonbox(msg="¿Quieres jugar contra la máquina o con alguien?",
-                                title="Selección de Jugadores",
-                                choices=["Contra la máquina", "Con alguien"])
+    global playerOne, playerTwo, undoMoveEnabled
+
+    # Mensaje y título principal
+    msg = "¿Quieres jugar contra la máquina o con alguien?"
+    title = "Selección de Jugadores"
+    choices = ["Contra la máquina", "Con alguien"]
+
+    # Elección del tipo de jugador
+    choice = easygui.buttonbox(msg=msg, title=title, choices=choices)
+
+    # Condiciones según la elección
     if choice == "Contra la máquina":
-        choiceAI = easygui.buttonbox(msg="¿Qué color quieres jugar?",
-                                     title="Selección de Color",
-                                     choices=["Blancas", "Negras"])
+        msg = "¿Qué color quieres jugar?"
+        title = "Selección de Color"
+        choices = ["Blancas", "Negras"]
+        choiceAI = easygui.buttonbox(msg=msg, title=title, choices=choices)
+
+        # Asignar valores según el color elegido
         if choiceAI == "Blancas":
             playerOne = True
             playerTwo = False
         elif choiceAI == "Negras":
             playerOne = False
             playerTwo = True
+
         undoMoveEnabled = False
+
     elif choice == "Con alguien":
         playerOne = True
         playerTwo = True
@@ -165,9 +179,10 @@ Dibujar los cuadrados en el tablero. OJO: El cuadrado de arriba a la izquierda d
 '''
 def drawBoard(screen):
     global colors
-    #colors = [p.Color("white"), p.Color("gray")] # Colores del tablero (blanco y gris)
+    #colors = [p.Color("white"), p.Color("gray")] # Colores del tablero (blanco y gris) para posible cambio color tablero
     colors = [p.Color("#dfc07f"), p.Color("#7a4f37")] # Colores del tablero (marron y clarito)
-    # El primer for recorre filas, el segundo recorre columnas. Dibuja cada cuadrado del tablero
+
+    # El primer for recorre filas, el segundo recorre columnas. Dibuja cada casilla del tablero
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             color = colors[((r+c) % 2)] # Alterna los colores de los cuadrados para simular un tablero de ajedrez
@@ -267,8 +282,5 @@ def drawEndGameText(screen, text):
     screen.blit(textObject, textLocation.move(2, 2))
 
 if __name__ == "__main__":
-    main() # Ejecuta la función main si este archivo es el programa principal
-
-
-# NOTA:Para mate rapido, mover: peon alfil blanco rey 1, peon rey negro 2, peon caballo blanco rey 2 y reina negra por la diagonal
-
+    # Ejecuta la función main si este archivo es el programa principal
+    main()

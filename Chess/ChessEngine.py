@@ -21,7 +21,6 @@ class GameState():
         # Diccionario para la funcion getAllPossibleMoves
         self.moveFunctions = {'p' : self.getPawnMoves, 'R' : self.getRookMoves, 'N' : self.getKnightMoves,
                               'B' : self.getBishopMoves, 'Q' : self.getQueenMoves, 'K' : self.getKingMoves}
-
         # Variable para saber a quien le toca jugar (True si le toca a las blancas, False si le toca a las negras)
         self.whiteToMove = True
         # Lista para mantener un registro de los movimientos realizados durante la partida
@@ -68,6 +67,7 @@ class GameState():
             self.enpassantPossible = ((move.startRow + move.endRow)//2, move.startCol)
         else:
             self.enpassantPossible = ()
+
         # Enroque
         if move.isCastleMove:
             if move.endCol - move.startCol == 2: # Enroque por lado del rey
@@ -78,7 +78,6 @@ class GameState():
                 self.board[move.endRow][move.endCol-2] = '--'
 
         self.enPassantPossibleLog.append(self.enpassantPossible)
-
         # Actualizar posibilidad de enrocar (cuando es movimiento de rey o torre)
         self.updateCastleRights(move)
         self.castleRightsLog.append(CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks,
@@ -302,7 +301,6 @@ class GameState():
     """
     Obtener todos los movimientos del caballo en la fila y columna y añadir los movimientos a la lista "moves"
     """
-
     def getKnightMoves(self, r, c, moves):
         knightMoves = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)) # Movimiento en L
         allyColor = "w" if self.whiteToMove else "b"
@@ -317,7 +315,6 @@ class GameState():
     """
     Obtener todos los movimientos del alfil en la fila y columna y añadir los movimientos a la lista "moves"
     """
-
     def getBishopMoves(self, r, c, moves):
         directions = ((-1, -1), (-1, 1), (1, -1), (1, 1)) # Las 4 diagonales
         enemyColor = "b" if self.whiteToMove else "w" # Si el turno es de blancas el enemigo son las negras y viceversa
@@ -348,7 +345,6 @@ class GameState():
     """
     Obtener todos los movimientos del rey en la fila y columna y añadir los movimientos a la lista "moves"
     """
-
     def getKingMoves(self, r, c, moves):
         kingMoves = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
         colorAlly = "w" if self.whiteToMove else "b"

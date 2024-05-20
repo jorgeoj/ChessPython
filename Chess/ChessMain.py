@@ -16,16 +16,6 @@ MAX_FPS = 15 # Establece el máximo de fps para animaciones más adelante
 IMAGES = {} # Diccionario global para almacenar las imágenes de las piezas del ajedrez
 
 '''
-Inicializa un diccionario global de imágenes. Esto se llamará exactamente una vez en el main.
-'''
-def loadImages():
-    pieces = ['wp', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bp', 'bR', 'bN', 'bB', 'bK', 'bQ']
-    for piece in pieces:
-        # Carga las imágenes de las piezas y las escala al tamaño del cuadrado del tablero
-        IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE))
-    # OJO: Podemos acceder a imagenes también poniendo: IMAGES['wp'] (wp como ejemplo de cada pieza)
-
-'''
 El main de nuestro código. Se encargará de la entrada del usuario y de actualizar los gráficos.
 '''
 def main():
@@ -38,15 +28,11 @@ def main():
     validMoves = gs.getValidMoves() # Generamos los movimientos validos y los guardamos en una lista
     moveMade = False # Variable flag para cuando un movimiento es hecho
     animate = False # Flag para cuando haya que animar un movimiento
-    loadImages() # Carga las imágenes de las piezas
+    loadPiecesImages() # Carga las imágenes de las piezas
     running = True
     sqSelected = () # Vble para saber el cuadrado seleccionado, inicialmente no hay ninguna (tuple)
     playerClicks = [] # Constancia de los clicks del jugador para mover las piezas (2 tuples)
     gameOver = False
-
-    #playerOne = True # Si el jugador juega blancas será verdadero si lo hace la IA será falso
-    #playerTwo = False # Lo mismo de arriba pero con las negras
-
     selectPlayer()
 
     while running:
@@ -61,8 +47,7 @@ def main():
                     location = p.mouse.get_pos() # Localizacion en ejes x e y del raton
                     col = location[0]//SQ_SIZE
                     row = location[1]//SQ_SIZE
-                    # Si el jugador pulsa 2 veces la misma casilla, se deselecciona la casilla o se hizo clic en el log
-                    # if sqSelected == (col, row) or col >= 8: (Anterior parece que el de abajo soluciona los bugs)
+                    # Si el jugador pulsa 2 veces la misma casilla, se deselecciona la casilla o si se hizo clic en el log
                     if sqSelected == (row, col) or col >= 8:
                         sqSelected = ()
                         playerClicks = [] # Limpiar clicks de jugador
@@ -72,7 +57,6 @@ def main():
                     # Si el jugador ha hecho click dos veces hacemos que se mueva la pieza
                     if len(playerClicks) == 2:
                         move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                        print(move.getChessNotation())
                         for i in range(len(validMoves)):
                             if move == validMoves[i]:
                                 gs.makeMove(validMoves[i])
@@ -130,6 +114,15 @@ def main():
         p.display.flip() # Actualiza la pantalla
 
 '''
+Inicializa un diccionario global de imágenes. Esto se llamará exactamente una vez en el main.
+'''
+def loadPiecesImages():
+    pieces = ['wp', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bp', 'bR', 'bN', 'bB', 'bK', 'bQ']
+    for piece in pieces:
+        # Carga las imágenes de las piezas y las escala al tamaño del cuadrado del tablero
+        IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE))
+
+'''
 Responsable de los valores de decidir como se jugará
 '''
 def selectPlayer():
@@ -139,17 +132,15 @@ def selectPlayer():
     msg = "¿Quieres jugar contra la máquina o con alguien?"
     title = "Selección de Jugadores"
     choices = ["Contra la máquina", "Con alguien"]
-
     # Elección del tipo de jugador
-    choice = easygui.buttonbox(msg=msg, title=title, choices=choices)
+    choice = easygui.buttonbox(msg = msg, title = title, choices = choices)
 
     # Condiciones según la elección
     if choice == "Contra la máquina":
         msg = "¿Qué color quieres jugar?"
         title = "Selección de Color"
         choices = ["Blancas", "Negras"]
-        choiceAI = easygui.buttonbox(msg=msg, title=title, choices=choices)
-
+        choiceAI = easygui.buttonbox(msg = msg, title = title, choices = choices)
         # Asignar valores según el color elegido
         if choiceAI == "Blancas":
             playerOne = True
@@ -158,8 +149,7 @@ def selectPlayer():
             playerOne = False
             playerTwo = True
 
-        undoMoveEnabled = False
-
+        undoMoveEnabled = False # Variable para permitir deshacer movimiento o no
     elif choice == "Con alguien":
         playerOne = True
         playerTwo = True
@@ -179,7 +169,7 @@ Dibujar los cuadrados en el tablero. OJO: El cuadrado de arriba a la izquierda d
 '''
 def drawBoard(screen):
     global colors
-    #colors = [p.Color("white"), p.Color("gray")] # Colores del tablero (blanco y gris) para posible cambio color tablero
+    # colors = [p.Color("white"), p.Color("gray")] Colores del tablero (blanco y gris) para posible cambio color tablero
     colors = [p.Color("#dfc07f"), p.Color("#7a4f37")] # Colores del tablero (marron y clarito)
 
     # El primer for recorre filas, el segundo recorre columnas. Dibuja cada casilla del tablero
@@ -255,12 +245,12 @@ def animateMove(move, screen, board, clock):
     framesPerSquare = 10 # Frames para mover una casilla
     frameCount = (abs(dR) + abs(dC)) * framesPerSquare
     for frame in range(frameCount + 1):
-        r, c = (move.startRow + dR*frame/frameCount, move.startCol + dC*frame/frameCount)
+        r, c = (move.startRow + dR * frame/frameCount, move.startCol + dC * frame/frameCount)
         drawBoard(screen)
         drawPieces(screen, board)
         # Borrar la pieza movida de su casilla final
         color = colors[(move.endRow + move.endCol) % 2]
-        endSquare = p.Rect(move.endCol*SQ_SIZE, move.endRow*SQ_SIZE, SQ_SIZE, SQ_SIZE)
+        endSquare = p.Rect(move.endCol * SQ_SIZE, move.endRow * SQ_SIZE, SQ_SIZE, SQ_SIZE)
         p.draw.rect(screen, color, endSquare)
         # Dibujar la pieza capturada en el rectangulo
         if move.pieceCaptured != '--':
@@ -269,18 +259,19 @@ def animateMove(move, screen, board, clock):
                 endSquare = p.Rect(move.endCol * SQ_SIZE, enPassantRow * SQ_SIZE, SQ_SIZE, SQ_SIZE)
             screen.blit(IMAGES[move.pieceCaptured], endSquare)
         # Dibujar la pieza moviendose
-        screen.blit(IMAGES[move.pieceMoved], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+        screen.blit(IMAGES[move.pieceMoved], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
         p.display.flip()
         clock.tick(60)
 
 def drawEndGameText(screen, text):
     font = p.font.SysFont("Arial", 30, True, False) # Nombre fuente, tamaño, negrita, italica
     textObject = font.render(text, 0, p.Color('Black'))
-    textLocation = p.Rect(0, 0, BOARD_WIDTH, BOARD_HEIGHT).move(BOARD_WIDTH / 2 - textObject.get_width() / 2, BOARD_HEIGHT / 2 - textObject.get_height() / 2)
+    textLocation = p.Rect(0, 0, BOARD_WIDTH, BOARD_HEIGHT).move(BOARD_WIDTH / 2 - textObject.get_width() / 2,
+                                                                BOARD_HEIGHT / 2 - textObject.get_height() / 2)
     screen.blit(textObject, textLocation)
     textObject = font.render(text, 0, p.Color('Yellow'))
     screen.blit(textObject, textLocation.move(2, 2))
 
+# Ejecuta la función main si este archivo es el programa principal
 if __name__ == "__main__":
-    # Ejecuta la función main si este archivo es el programa principal
     main()

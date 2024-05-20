@@ -40,7 +40,7 @@ class GameState():
                                              self.currentCastlingRight.wqs, self.currentCastlingRight.bqs)]
 
     """
-    Coge un movimiento como parametro y lo ejecuta (No funciona para enrocar, en-passant y promoción)
+    Coge un movimiento como parametro y lo ejecuta
     """
     def makeMove(self, move):
         # Actualiza el tablero con el movimiento realizado
@@ -53,15 +53,12 @@ class GameState():
             self.whiteKingLocation = (move.endRow, move.endCol)
         elif move.pieceMoved == 'bK':
             self.blackKingLocation = (move.endRow, move.endCol)
-
         # Promocion de peones
         if move.isPawnPromotion:
             self.board[move.endRow][move.endCol] = move.pieceMoved[0] + 'Q' # Coge el color de la pieza y lo convierte en reina directamente
-
         # Enpassant
         if move.isEnpassantMove:
             self.board[move.startRow][move.endCol] = '--' # Capturar el peon
-
         # Actualizar variable enPassantPossible
         if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2: # Solo avances de 2 casillas de peones
             self.enpassantPossible = ((move.startRow + move.endRow)//2, move.startCol)
@@ -104,12 +101,10 @@ class GameState():
 
             self.enPassantPossibleLog.pop()
             self.enpassantPossible = self.enPassantPossibleLog[-1]
-
             # Deshacer derecho a enrocar
             self.castleRightsLog.pop() # librarse de los nuevos derechos del movimiento que estamos deshaciendo
             newRights = self.castleRightsLog[-1]
             self.currentCastlingRight = CastleRights(newRights.wks, newRights.bks, newRights.wqs, newRights.bqs)
-
             # Deshacer el enroque
             if move.isCastleMove:
                 if move.endCol - move.startCol == 2:  # Lado del rey
@@ -179,12 +174,12 @@ class GameState():
         for i in range(len(moves)-1, -1, -1): # Recorrer la lista del reves para que al borrar no de problemas
             self.makeMove(moves[i])
             self.whiteToMove = not self.whiteToMove
-            if self.inCheck():
+            if self.playerInCheck():
                 moves.remove(moves[i]) # Quitamos el movimiento no valido
             self.whiteToMove = not self.whiteToMove
             self.undoMove()
         if len(moves) == 0: # Esto significa que es jaque o estancamiento (rey ahogado)
-            if self.inCheck():
+            if self.playerInCheck():
                 self.checkmate = True
             else:
                 self.stalemate = True
@@ -199,7 +194,7 @@ class GameState():
     """
     Determina si el jugador está en jaque
     """
-    def inCheck(self):
+    def playerInCheck(self):
         if self.whiteToMove:
             return self.squareUnderAttack(self.whiteKingLocation[0], self.whiteKingLocation[1])
         else:
@@ -238,42 +233,42 @@ class GameState():
     def getPawnMoves(self, r, c, moves):
         if self.whiteToMove: # Movimiento de los peones blancos
             # El peon avanza una casilla
-            if self.board[r-1][c] == "--":
-                moves.append(Move((r,c), (r-1, c), self.board))
+            if self.board[r - 1][c] == "--":
+                moves.append(Move((r, c), (r - 1, c), self.board))
                 # Para el movimiento de 2 casillas (si esta en la fila 6 es su posicion inicial)
-                if r == 6 and self.board[r-2][c] == "--":
-                    moves.append(Move((r,c), (r-2, c), self.board))
+                if r == 6 and self.board[r - 2][c] == "--":
+                    moves.append(Move((r, c), (r - 2, c), self.board))
             # Controlar que no se salga del tablero al capturar a la izquierda
-            if c-1 >= 0:
-                if self.board[r-1][c-1][0] == 'b':
-                    moves.append(Move((r, c), (r-1, c-1), self.board))
-                elif (r-1, c-1) == self.enpassantPossible:
-                    moves.append(Move((r, c), (r - 1, c - 1), self.board, isEnpassantMove=True))
+            if c - 1 >= 0:
+                if self.board[r - 1][c - 1][0] == 'b':
+                    moves.append(Move((r, c), (r - 1, c - 1), self.board))
+                elif (r - 1, c - 1) == self.enpassantPossible:
+                    moves.append(Move((r, c), (r - 1, c - 1), self.board, isEnpassantMove = True))
             # Para capturar a la derecha
-            if c+1 <= 7:
-                if self.board[r-1][c+1][0] == 'b': # indicamos que la pieza es de color contrario
-                    moves.append(Move((r, c), (r-1, c+1), self.board))
-                elif (r-1, c+1) == self.enpassantPossible:
-                    moves.append(Move((r, c), (r - 1, c + 1), self.board, isEnpassantMove=True))
+            if c + 1 <= 7:
+                if self.board[r - 1][c + 1][0] == 'b': # indicamos que la pieza es de color contrario
+                    moves.append(Move((r, c), (r - 1, c + 1), self.board))
+                elif (r - 1, c + 1) == self.enpassantPossible:
+                    moves.append(Move((r, c), (r - 1, c + 1), self.board, isEnpassantMove = True))
         # Movimiento de los peones negros
         else:
             # El peon avanza una casilla
-            if self.board[r+1][c] == "--":
-                moves.append(Move((r,c), (r+1, c), self.board))
+            if self.board[r + 1][c] == "--":
+                moves.append(Move((r, c), (r + 1, c), self.board))
                 # Para el movimiento de 2 casillas (si esta en la fila 1 es su posicion inicial)
                 if r == 1 and self.board[r + 2][c] == "--":
-                    moves.append(Move((r, c), (r+2, c), self.board))
+                    moves.append(Move((r, c), (r + 2, c), self.board))
             # Capturar piezas
-            if c-1 >= 0: # capturar a la izquierda
-                if self.board[r+1][c-1][0] == 'w':
-                    moves.append(Move((r, c), (r+1, c-1), self.board))
-                elif (r+1, c-1) == self.enpassantPossible:
-                    moves.append(Move((r, c), (r + 1, c - 1), self.board, isEnpassantMove=True))
-            if c+1 <= 7: # capturar a la derecha
-                if self.board[r+1][c+1][0] == 'w':
-                    moves.append(Move((r, c), (r+1, c+1), self.board))
-                elif (r+1, c+1) == self.enpassantPossible:
-                    moves.append(Move((r, c), (r + 1, c + 1), self.board, isEnpassantMove=True))
+            if c - 1 >= 0: # capturar a la izquierda
+                if self.board[r + 1][c - 1][0] == 'w':
+                    moves.append(Move((r, c), (r + 1, c - 1), self.board))
+                elif (r + 1, c - 1) == self.enpassantPossible:
+                    moves.append(Move((r, c), (r + 1, c - 1), self.board, isEnpassantMove = True))
+            if c + 1 <= 7: # capturar a la derecha
+                if self.board[r + 1][c + 1][0] == 'w':
+                    moves.append(Move((r, c), (r + 1, c + 1), self.board))
+                elif (r + 1, c + 1) == self.enpassantPossible:
+                    moves.append(Move((r, c), (r + 1, c + 1), self.board, isEnpassantMove = True))
 
 
     """
@@ -370,14 +365,14 @@ class GameState():
 
 
     def getKingsideCastleMoves(self, r, c, moves):
-        if self.board[r][c+1] == '--' and self.board[r][c+2] == '--':
-            if not self.squareUnderAttack(r, c+1) and not self.squareUnderAttack(r, c+2):
-                moves.append(Move((r,c), (r, c+2), self.board, isCastleMove=True))
+        if self.board[r][c + 1] == '--' and self.board[r][c + 2] == '--':
+            if not self.squareUnderAttack(r, c + 1) and not self.squareUnderAttack(r, c + 2):
+                moves.append(Move((r, c), (r, c + 2), self.board, isCastleMove = True))
 
     def getQueensideCastleMoves(self, r, c, moves):
-        if self.board[r][c-1] == '--' and self.board[r][c-2] == '--' and self.board[r][c-3] == '--':
+        if self.board[r][c - 1] == '--' and self.board[r][c - 2] == '--' and self.board[r][c - 3] == '--':
             if not self.squareUnderAttack(r, c - 1) and not self.squareUnderAttack(r, c - 2):
-                moves.append(Move((r, c), (r, c - 2), self.board, isCastleMove=True))
+                moves.append(Move((r, c), (r, c - 2), self.board, isCastleMove = True))
 
 class CastleRights():
     #wks: white king side, bks: black king side, wqs: white queen side, bks: black queen side,
@@ -386,7 +381,6 @@ class CastleRights():
         self.bks = bks
         self.wqs = wqs
         self.bqs = bqs
-
 
 class Move():
     # Mapea claves a valores Clave : Valor
@@ -415,9 +409,7 @@ class Move():
             self.pieceCaptured = 'wp' if self.pieceMoved == 'bp' else 'bp'
 
         self.isCapture = self.pieceCaptured != '--'
-
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
-        # print(self.moveID)
 
     """
     Override metodo equals

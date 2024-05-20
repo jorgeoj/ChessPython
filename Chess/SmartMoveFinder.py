@@ -1,71 +1,76 @@
+"""
+Esta clase es responsable de calcular los mejores movimientos que pueda hacer la IA (Inteligencia artificial) para
+jugar en contra del usuario
+"""
+
 import random
 
 pieceScore = {"K": 0, "Q": 10, "R": 5, "B": 3, "N": 3, "p": 1}
 
 # Evaluacion de puntuacion para los caballos (mejor que no se vayan a las columnas 1 o 8) y otras piezas
-knightScore = [[1, 1, 1, 1, 1, 1, 1, 1],
-               [1, 2, 2, 2, 2, 2, 2, 1],
-               [1000, 2, 3, 3, 3, 3, 2, 1000],
-               [-1, 2, 3, 4, 4, 3, 2, -1],
-               [-1, 2, 3, 4, 4, 3, 2, -1],
-               [-1, 2, 3, 3, 3, 3, 2, -1],
-               [1, 2, 2, 2, 2, 2, 2, 1],
-               [1, 1, 1, 1, 1, 1, 1, 1]]
+knightPositionScores = [[1, 1, 1, 1, 1, 1, 1, 1],
+                        [1, 2, 2, 2, 2, 2, 2, 1],
+                        [1000, 2, 3, 3, 3, 3, 2, 1000],
+                        [-1, 2, 3, 4, 4, 3, 2, -1],
+                        [-1, 2, 3, 4, 4, 3, 2, -1],
+                        [-1, 2, 3, 3, 3, 3, 2, -1],
+                        [1, 2, 2, 2, 2, 2, 2, 1],
+                        [1, 1, 1, 1, 1, 1, 1, 1]]
 
 # Buscamos las diagonales con los alfiles
-bishopScores = [[4, 3, 2, 1, 1, 2, 3, 4],
-               [3, 4, 3, 2, 2, 3, 4, 3],
-               [2, 3, 4, 3, 3, 4, 3, 2],
-               [1, 2, 3, 4, 4, 3, 2, 1],
-               [1, 2, 3, 4, 4, 3, 2, 1],
-               [2, 3, 4, 3, 3, 4, 3, 2],
-               [3, 4, 3, 2, 2, 3, 4, 3],
-               [4, 3, 2, 1, 1, 2, 3, 4]]
+bishopPositionScores = [[4, 3, 2, 1, 1, 2, 3, 4],
+                        [3, 4, 3, 2, 2, 3, 4, 3],
+                        [2, 3, 4, 3, 3, 4, 3, 2],
+                        [1, 2, 3, 4, 4, 3, 2, 1],
+                        [1, 2, 3, 4, 4, 3, 2, 1],
+                        [2, 3, 4, 3, 3, 4, 3, 2],
+                        [3, 4, 3, 2, 2, 3, 4, 3],
+                        [4, 3, 2, 1, 1, 2, 3, 4]]
 
 # Cuanto mas por el centro la reina mejor
-queenScores = [[1, 1, 1, 3, 1, 1, 1, 1],
-               [1, 2, 3, 3, 3, 1, 1, 1],
-               [1, 4, 3, 3, 3, 4, 2, 1],
-               [1, 2, 3, 3, 3, 2, 2, 1],
-               [1, 2, 3, 3, 3, 2, 2, 1],
-               [1, 4, 3, 3, 3, 4, 2, 1],
-               [1, 1, 2, 3, 3, 1, 1, 1],
-               [1, 1, 1, 3, 1, 1, 1, 1]]
+queenPositionScores = [[1, 1, 1, 3, 1, 1, 1, 1],
+                       [1, 2, 3, 3, 3, 1, 1, 1],
+                       [1, 4, 3, 3, 3, 4, 2, 1],
+                       [1, 2, 3, 3, 3, 2, 2, 1],
+                       [1, 2, 3, 3, 3, 2, 2, 1],
+                       [1, 4, 3, 3, 3, 4, 2, 1],
+                       [1, 1, 2, 3, 3, 1, 1, 1],
+                       [1, 1, 1, 3, 1, 1, 1, 1]]
 
-rookScores = [[6, 2, 4, 4, 4, 4, 2, 6],
-               [1, 4, 4, 4, 4, 4, 4, 1],
-               [1, 1, 2, 3, 3, 2, 1, 1],
-               [1, 2, 3, 4, 4, 3, 2, 1],
-               [1, 2, 3, 4, 4, 3, 2, 1],
-               [1, 1, 2, 3, 3, 2, 1, 1],
-               [1, 4, 4, 4, 4, 4, 4, 1],
-               [6, 2, 4, 4, 4, 4, 2, 6]]
+rookPositionScores = [[6, 2, 4, 4, 4, 4, 2, 6],
+                      [1, 4, 4, 4, 4, 4, 4, 1],
+                      [1, 1, 2, 3, 3, 2, 1, 1],
+                      [1, 2, 3, 4, 4, 3, 2, 1],
+                      [1, 2, 3, 4, 4, 3, 2, 1],
+                      [1, 1, 2, 3, 3, 2, 1, 1],
+                      [1, 4, 4, 4, 4, 4, 4, 1],
+                      [6, 2, 4, 4, 4, 4, 2, 6]]
 
-whitePawnScores = [[8, 8, 8, 8, 8, 8, 8, 8],
-               [8, 8, 8, 8, 8, 8, 8, 8],
-               [5, 6, 6, 7, 7, 6, 6, 5],
-               [2, 3, 3, 5, 5, 3, 3, 2],
-               [1, 2, 3, 4, 4, 3, 2, 1],
-               [1, 1, 2, 3, 3, 2, 1, 1],
-               [0, 1, 1, 0, 0, 1, 1, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0]]
+whitePawnPositionScores = [[8, 8, 8, 8, 8, 8, 8, 8],
+                           [8, 8, 8, 8, 8, 8, 8, 8],
+                           [5, 6, 6, 7, 7, 6, 6, 5],
+                           [2, 3, 3, 5, 5, 3, 3, 2],
+                           [1, 2, 3, 4, 4, 3, 2, 1],
+                           [1, 1, 2, 3, 3, 2, 1, 1],
+                           [0, 1, 1, 0, 0, 1, 1, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0]]
 
-blackPawnScores = [[0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 1, 1, 0, 0, 1, 1, 0],
-               [1, 1, 2, 3, 3, 2, 1, 1],
-               [1, 2, 3, 4, 4, 3, 2, 1],
-               [1, 3, 3, 5, 5, 3, 3, 1],
-               [5, 6, 6, 7, 7, 6, 6, 5],
-               [8, 8, 8, 8, 8, 8, 8, 8],
-               [8, 8, 8, 8, 8, 8, 8, 8]]
+blackPawnPositionScores = [[0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 1, 1, 0, 0, 1, 1, 0],
+                           [1, 1, 2, 3, 3, 2, 1, 1],
+                           [1, 2, 3, 4, 4, 3, 2, 1],
+                           [1, 3, 3, 5, 5, 3, 3, 1],
+                           [5, 6, 6, 7, 7, 6, 6, 5],
+                           [8, 8, 8, 8, 8, 8, 8, 8],
+                           [8, 8, 8, 8, 8, 8, 8, 8]]
 
 
-piecePositionScores = {"N": knightScore, "Q": queenScores, "B": bishopScores, "R": rookScores, "bp": blackPawnScores,
-                       "wp": whitePawnScores}
+piecePositionScores = {"N": knightPositionScores, "Q": queenPositionScores, "B": bishopPositionScores, "R": rookPositionScores, "bp": blackPawnPositionScores,
+                       "wp": whitePawnPositionScores}
 
-CHECKMATE = 1000
-STALEMATE = 0
-DEPTH = 2 # Movimientos a futuro a calcular
+CHECKMATE_POINTS = 1000
+STALEMATE_POINTS = 0
+MOVEMENT_DEPTH = 2 # Movimientos a futuro a calcular
 
 '''
 Coge un movimiento aleatorio de la lista y lo devuelve
@@ -78,7 +83,7 @@ Encuentra el mejor movimiento min max sin recursion
 '''
 def findBestMoveMinMaxNoRecursion(gs, validMoves):
     turnMultiplier = 1 if gs.whiteToMove else -1
-    opponentMinMaxScore = CHECKMATE
+    opponentMinMaxScore = CHECKMATE_POINTS
     bestPlayerMove = None
     random.shuffle(validMoves)
 
@@ -86,18 +91,18 @@ def findBestMoveMinMaxNoRecursion(gs, validMoves):
         gs.makeMove(playerMove)
         opponentsMoves = gs.getValidMoves()
         if gs.stalemate:
-            opponentMaxScore = STALEMATE
+            opponentMaxScore = STALEMATE_POINTS
         elif gs.checkmate:
-            opponentMaxScore = -CHECKMATE
+            opponentMaxScore = -CHECKMATE_POINTS
         else:
-            opponentMaxScore = -CHECKMATE
+            opponentMaxScore = -CHECKMATE_POINTS
             for opponentsMoves in opponentsMoves:
                 gs.makeMove(opponentsMoves)
                 gs.getValidMoves()
                 if gs.checkmate:
-                    score = CHECKMATE
+                    score = CHECKMATE_POINTS
                 elif gs.stalemate:
-                    score = STALEMATE
+                    score = STALEMATE_POINTS
                 else:
                     score = -turnMultiplier * scoreMaterial(gs.board)
                 if score > opponentMaxScore:
@@ -109,55 +114,30 @@ def findBestMoveMinMaxNoRecursion(gs, validMoves):
         gs.undoMove()
     return bestPlayerMove
 
-
 '''
 Función de ayuda para hacer la primera llamada recursiva
 '''
 def findBestMove(gs, validMoves):
-    global nextMove, counter
+    global nextMove
     nextMove = None
     random.shuffle(validMoves)
-    counter = 0 # Para ver la diferencia de movimientos calculados entre un metodo y otro
-    findMoveNegaMaxAlphaBeta(gs, validMoves, DEPTH, -CHECKMATE, CHECKMATE, 1 if gs.whiteToMove else -1)
-    print(counter)
-
+    findMoveNegaMaxAlphaBeta(gs, validMoves, MOVEMENT_DEPTH, -CHECKMATE_POINTS, CHECKMATE_POINTS, 1 if gs.whiteToMove else -1)
     return nextMove
 
-'''
-def findMoveNegaMax(gs, validMoves, depth, turnMultiplier):
-    global nextMove, counter
-    counter += 1
-    if depth == 0:
-        return turnMultiplier * scoreBoard(gs)
-
-    maxScore = -CHECKMATE
-    for move in validMoves:
-        gs.makeMove(move)
-        nextMoves = gs.getValidMoves()
-        score = -findMoveNegaMax(gs, nextMoves, depth - 1, -turnMultiplier)
-        if score > maxScore:
-            maxScore = score
-            if depth == DEPTH:
-                nextMove = move
-        gs.undoMove()
-    return maxScore
-'''
-
 def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier):
-    global nextMove, counter
-    counter += 1
+    global nextMove
     if depth == 0:
         return turnMultiplier * scoreBoard(gs)
 
     # Ordenar movimientos - IMPLEMENTAR MAS ADELANTE
-    maxScore = -CHECKMATE
+    maxScore = -CHECKMATE_POINTS
     for move in validMoves:
         gs.makeMove(move)
         nextMoves = gs.getValidMoves()
         score = -findMoveNegaMaxAlphaBeta(gs, nextMoves, depth - 1, -beta, -alpha, -turnMultiplier)
         if score > maxScore:
             maxScore = score
-            if depth == DEPTH:
+            if depth == MOVEMENT_DEPTH:
                 nextMove = move
         gs.undoMove()
         # Aqui se elimina de manera selectiva las ramas
@@ -173,11 +153,11 @@ Puntuacion positiva buena para blancas, puntuación negativa buena para negras
 def scoreBoard(gs):
     if gs.checkmate:
         if gs.whiteToMove:
-            return -CHECKMATE # Las negras ganan
+            return -CHECKMATE_POINTS # Las negras ganan
         else:
-            return CHECKMATE # Las blancas ganan
+            return CHECKMATE_POINTS # Las blancas ganan
     elif gs.stalemate:
-        return STALEMATE
+        return STALEMATE_POINTS
 
     score = 0
     for row in range(len(gs.board)):

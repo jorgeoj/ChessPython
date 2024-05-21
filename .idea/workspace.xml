@@ -5,10 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="10a920ac-7f3a-4e6f-aac3-00d77685f0d8" name="Changes" comment="Cambio en mensajes fin partida, mensajes de seleccion y cambiado valores de evaluacion de movimiento por posicion">
+      <change afterPath="$PROJECT_DIR$/dist/images/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/images/bB.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/images/bK.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/images/bN.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/images/bQ.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/images/bR.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/images/bp.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/images/wB.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/images/wK.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/images/wN.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/images/wQ.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/images/wR.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/images/wp.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Chess/ChessEngine.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/ChessEngine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Chess/ChessMain.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/ChessMain.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Chess/SmartMoveFinder.py" beforeDir="false" afterPath="$PROJECT_DIR$/Chess/SmartMoveFinder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +52,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/jorge/PycharmProjects/ChessPython/images&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/jorge/PycharmProjects/ChessPython/dist&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -53,6 +63,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\jorge\PycharmProjects\ChessPython\dist" />
       <recent name="C:\Users\jorge\PycharmProjects\ChessPython\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -117,6 +128,8 @@
       <workItem from="1716102010010" duration="241000" />
       <workItem from="1716102260840" duration="202000" />
       <workItem from="1716214796610" duration="2484000" />
+      <workItem from="1716302533385" duration="525000" />
+      <workItem from="1716307031599" duration="637000" />
     </task>
     <task id="LOCAL-00001" summary="Añadidas las imagenes de todas las piezas y el talbero ya se pinta con las piezas incluidas (Aún no se pueden mover las piezas)">
       <option name="closed" value="true" />
